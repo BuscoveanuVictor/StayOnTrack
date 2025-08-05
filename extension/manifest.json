@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+    "name": "Focus",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "scripting",
+        "storage",
+        "activeTab",
+        "tabs"
+    ],
+
+    "web_accessible_resources": [
+        {
+            "resources": ["youtube-icon.png"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["http://localhost:*/*"],
+            "js": ["content.js"]
+        }
+    ]
+}

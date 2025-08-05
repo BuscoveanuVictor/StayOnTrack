@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block List</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .blocked-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .blocked-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .blocked-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .site-name {
+            font-size: 16px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-size: 16px;
+            padding: 40px 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Block List</h1>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>Gestionare Site-uri Blocate</h2>
+                <button class="add-btn" onclick="openModal()">+ Adauga Site Blocat</button>
+            </div>
+
+            <div class="section">
+                <h2>Site-uri Blocate</h2>
+                <ul id="blockedItems" class="blocked-list">
+                    <!-- Aici vor fi afisate site-urile blocate -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru adaugarea site-urilor -->
+    <div id="blockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Adauga Site Blocat</div>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="domainInput">Domeniu:</label>
+                <input type="text" id="domainInput" placeholder="ex: example.com">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Anuleaza</button>
+                <button class="btn btn-primary" onclick="addDomain()">Adauga</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let blockedSites = [];
+
+        function openModal() {
+            document.getElementById('blockModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('blockModal').style.display = 'none';
+            document.getElementById('domainInput').value = '';
+        }
+
+        function addDomain() {
+            const input = document.getElementById('domainInput');
+            const domain = input.value.trim();
+            
+            if (!domain) {
+                alert('Te rog introdu un domeniu!');
+                return;
+            }
+
+            if (blockedSites.includes(domain)) {
+                alert('Acest domeniu este deja in lista!');
+                return;
+            }
+
+            blockedSites.push(domain);
+            localStorage.setItem('blockedSites', JSON.stringify(blockedSites));
+            
+            displayBlockedSites();
+            closeModal();
+        }
+
+        function removeDomain(domain) {
+            if (confirm(`Esti sigur ca vrei sa elimini "${domain}" din lista?`)) {
+                blockedSites = blockedSites.filter(site => site !== domain);
+                localStorage.setItem('blockedSites', JSON.stringify(blockedSites));
+                displayBlockedSites();
+            }
+        }
+
+        function displayBlockedSites() {
+            const blockedItems = document.getElementById('blockedItems');
+            
+            if (blockedSites.length === 0) {
+                blockedItems.innerHTML = '<div class="empty-state">Nu ai site-uri blocate momentan</div>';
+                return;
+            }
+
+            blockedItems.innerHTML = blockedSites.map(site => `
+                <li class="blocked-item">
+                    <span class="site-name">🌐 ${site}</span>
+                    <button class="remove-btn" onclick="removeDomain('${site}')">Sterge</button>
+                </li>
+            `).join('');
+        }
+
+        // Inchide modal-ul cand se apasa in afara lui
+        window.onclick = function(event) {
+            const modal = document.getElementById('blockModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Incarca site-urile blocate la pornirea paginii
+        document.addEventListener('DOMContentLoaded', () => {
+            blockedSites = JSON.parse(localStorage.getItem('blockedSites') || '[]');
+            displayBlockedSites();
+        });
+
+        // Asculta mesaje de la extensie
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'BLOCKED_SITES') {
+                blockedSites = event.data.data;
+                displayBlockedSites();
+            }
+        });
+    </script>
+</body>
+</html>

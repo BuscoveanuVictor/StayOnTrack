@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .habits-sidebar {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .habits-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 20px;
+        }
+
+        .habit-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .habit-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .habit-item.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .streak-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .habit-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .add-habit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .add-habit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tasks-section {
+            padding: 30px;
+        }
+
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .selected-habit {
+            font-size: 28px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .add-task-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            color: #495057;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .no-habit-selected {
+            text-align: center;
+            color: #6c757d;
+            font-size: 18px;
+            margin-top: 100px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Habit Tracker</h1>
+        </div>
+        
+        <div class="main-content">
+            <div class="habits-sidebar">
+                <div class="habits-title">Obiective</div>
+                <div id="habitsList">
+                    <!-- Aici vor fi afisate obiectivele -->
+                </div>
+                <button class="add-habit-btn" onclick="showHabitModal()">+ Add habit</button>
+            </div>
+            
+            <div class="tasks-section">
+                <div id="tasksContent">
+                    <div class="no-habit-selected">
+                        Selecteaza un obiectiv pentru a vedea task-urile
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru adaugarea obiectivelor -->
+    <div id="habitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Adauga Obiectiv Nou</div>
+                <span class="close" onclick="closeHabitModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="habitName">Nume Obiectiv:</label>
+                <input type="text" id="habitName" placeholder="Ex: Sport, Citeste, etc.">
+            </div>
+            <div class="form-group">
+                <label for="habitFrequency">Frecventa:</label>
+                <select id="habitFrequency">
+                    <option value="daily">Zilnic</option>
+                    <option value="weekly">Saptamanal</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeHabitModal()">Anuleaza</button>
+                <button class="btn btn-primary" onclick="addHabit()">Adauga Obiectiv</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru adaugarea task-urilor -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Adauga Task</div>
+                <span class="close" onclick="closeTaskModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="taskName">Nume Task:</label>
+                <input type="text" id="taskName" placeholder="Ex: Plimbare - 15 min">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeTaskModal()">Anuleaza</button>
+                <button class="btn btn-primary" onclick="addTask()">Adauga Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedHabitId = null;
+                 let habits = [];
+         
+         // Incarca obiectivele din chrome.storage.sync sau localStorage
+         function loadHabits() {
+             if (typeof chrome !== 'undefined' && chrome.runtime) {
+                 chrome.storage.sync.get({ habits: [] }, (data) => {
+                     habits = data.habits;
+                     displayHabits();
+                     
+                     // Selecteaza primul obiectiv daca exista
+                     if (habits.length > 0) {
+                         selectHabit(habits[0].id);
+                     }
+                 });
+             } else {
+                 habits = JSON.parse(localStorage.getItem('habits') || '[]');
+                 displayHabits();
+                 
+                 // Selecteaza primul obiectiv daca exista
+                 if (habits.length > 0) {
+                     selectHabit(habits[0].id);
+                 }
+             }
+         }
+
+        function showHabitModal() {
+            document.getElementById('habitModal').style.display = 'block';
+        }
+
+        function closeHabitModal() {
+            document.getElementById('habitModal').style.display = 'none';
+            document.getElementById('habitName').value = '';
+        }
+
+        function showTaskModal() {
+            if (!selectedHabitId) {
+                alert('Te rog selecteaza un obiectiv mai intai!');
+                return;
+            }
+            document.getElementById('taskModal').style.display = 'block';
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').style.display = 'none';
+            document.getElementById('taskName').value = '';
+        }
+
+        function addHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            const frequency = document.getElementById('habitFrequency').value;
+
+            if (!name) {
+                alert('Te rog introdu un nume pentru obiectiv!');
+                return;
+            }
+
+            const habit = {
+                id: Date.now(),
+                name: name,
+                frequency: frequency,
+                streak: 0,
+                tasks: [],
+                completed: false
+            };
+
+                         habits.push(habit);
+             
+             // Salveaza in chrome.storage.sync daca e disponibil
+             if (typeof chrome !== 'undefined' && chrome.runtime) {
+                 chrome.storage.sync.set({ habits: habits }, () => {
+                     console.log('Obiectiv salvat in chrome.storage.sync');
+                 });
+             } else {
+                 localStorage.setItem('habits', JSON.stringify(habits));
+             }
+            
+            displayHabits();
+            closeHabitModal();
+        }
+
+        function addTask() {
+            const name = document.getElementById('taskName').value.trim();
+
+            if (!name) {
+                alert('Te rog introdu un nume pentru task!');
+                return;
+            }
+
+            const habit = habits.find(h => h.id === selectedHabitId);
+            if (habit) {
+                const task = {
+                    id: Date.now(),
+                    name: name,
+                    completed: false
+                };
+
+                                 habit.tasks.push(task);
+                 
+                 // Salveaza in chrome.storage.sync daca e disponibil
+                 if (typeof chrome !== 'undefined' && chrome.runtime) {
+                     chrome.storage.sync.set({ habits: habits }, () => {
+                         console.log('Task salvat in chrome.storage.sync');
+                     });
+                 } else {
+                     // Salveaza in chrome.storage.sync daca e disponibil
+                     if (typeof chrome !== 'undefined' && chrome.runtime) {
+                         chrome.storage.sync.set({ habits: habits }, () => {
+                             console.log('Obiectiv actualizat in chrome.storage.sync');
+                         });
+                     } else {
+                         localStorage.setItem('habits', JSON.stringify(habits));
+                     }
+                 }
+                
+                displayTasks(habit);
+                closeTaskModal();
+            }
+        }
+
+        function selectHabit(habitId) {
+            selectedHabitId = habitId;
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                displayTasks(habit);
+            }
+        }
+
+        function toggleTask(habitId, taskId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                const task = habit.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = !task.completed;
+                    
+                    // Verifica daca toate task-urile sunt completate
+                    const allCompleted = habit.tasks.every(t => t.completed);
+
+                    if (allCompleted) {
+                        if (habit.completed == false) {
+                            habit.streak++;
+                            habit.completed = true;
+                        }
+                    }
+                    
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    displayHabits();
+                    displayTasks(habit);
+                }
+            }
+        }
+
+        function displayHabits() {
+            const habitsList = document.getElementById('habitsList');
+            habitsList.innerHTML = '';
+
+            habits.forEach(habit => {
+                const habitElement = document.createElement('div');
+                habitElement.className = `habit-item ${habit.id === selectedHabitId ? 'active' : ''}`;
+                habitElement.onclick = () => selectHabit(habit.id);
+
+                habitElement.innerHTML = `
+                    <div class="streak-circle">${habit.streak}</div>
+                    <div class="habit-name">${habit.name}</div>
+                `;
+
+                habitsList.appendChild(habitElement);
+            });
+        }
+
+        function displayTasks(habit) {
+            const tasksContent = document.getElementById('tasksContent');
+            
+            tasksContent.innerHTML = `
+                <div class="tasks-header">
+                    <div class="selected-habit">${habit.name}</div>
+                    <button class="add-task-btn" onclick="showTaskModal()">+ Add task</button>
+                </div>
+                <div id="tasksList">
+                    ${habit.tasks.map(task => `
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" 
+                                   ${task.completed ? 'checked' : ''} 
+                                   onchange="toggleTask(${habit.id}, ${task.id})">
+                            <div class="task-text ${task.completed ? 'completed' : ''}">${task.name}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Inchide modal-urile cand se apasa in afara lor
+        window.onclick = function(event) {
+            const habitModal = document.getElementById('habitModal');
+            const taskModal = document.getElementById('taskModal');
+            
+            if (event.target === habitModal) {
+                closeHabitModal();
+            }
+            if (event.target === taskModal) {
+                closeTaskModal();
+            }
+        }
+
+                 // Incarca obiectivele la pornirea paginii
+         document.addEventListener('DOMContentLoaded', () => {
+             loadHabits();
+         });
+    </script>
+</body>
+</html>
