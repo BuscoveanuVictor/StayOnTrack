@@ -22,7 +22,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
             // Foloseste cache-ul in loc sa citesti din storage
             if (blockedSitesCache.includes(hostname)) {
                 console.log("Site-ul este blocat:", hostname);
-                chrome.tabs.update(tabId, { url: "http://localhost/progress"});
+                chrome.tabs.update(tabId, { url: "http://localhost"}); //aici era "http://localhost/progress"
             }
         } catch (e) {
             console.error("Eroare la procesarea URL-ului:", e);

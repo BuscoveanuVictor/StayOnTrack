@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block List</title>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Block List</h1>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>Gestionare Site-uri Blocate</h2>
+                <button class="add-btn" onclick="openModal()">+ Adauga Site Blocat</button>
+            </div>
+
+            <div class="section">
+                <h2>Site-uri Blocate</h2>
+                <ul id="blockedItems" class="blocked-list">
+                    <!-- Aici vor fi afisate site-urile blocate -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru adaugarea site-urilor -->
+    <div id="blockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Adauga Site Blocat</div>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="domainInput">Domeniu:</label>
+                <input type="text" id="domainInput" placeholder="ex: example.com">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Anuleaza</button>
+                <button class="btn btn-primary" onclick="addDomain()">Adauga</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        c
+    </script>
+</body>
+
+
+<style>
+</style>
+
+</html>

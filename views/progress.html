@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracker</title>
+   
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Progress Tracker</h1>
+        </div>
+        
+        <div class="content">
+            <button class="refresh-btn" onclick="loadAllItems()">🔄 Actualizeaza</button>
+
+            <div class="stats">
+                <div class="stats-title">Statistici Zilnice</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalItems">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completedItems">0</div>
+                        <div class="stat-label">Completate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completionRate">0%</div>
+                        <div class="stat-label">Progres</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title habits">
+                    <span class="section-icon">🎯</span>
+                    Obiective (Habits)
+                </div>
+                <ul class="item-list" id="habitsList">
+                    <!-- Aici vor fi afisate obiectivele -->
+                </ul>
+            </div>
+
+            <div class="section">
+                <div class="section-title tasks">
+                    <span class="section-icon">📋</span>
+                    Task-uri
+                </div>
+                <ul class="item-list" id="tasksList">
+                    <!-- Aici vor fi afisate task-urile -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadAllItems() {
+             // Incarca obiectivele si task-urile din chrome.storage.sync prin content script
+            //  if (typeof chrome !== 'undefined' && chrome.runtime) {
+            //      // Daca suntem in contextul extensiei, folosim chrome.storage.sync
+            //      chrome.storage.sync.get({ habits: [], tasks: [] }, (data) => {
+            //          const habits = data.habits;
+            //          const tasks = data.tasks;
+            //          processItems(habits, tasks);
+            //      });
+            //  } else {
+            //      // Fallback pentru localStorage
+                 
+            //  }
+
+            const habits = JSON.parse(localStorage.getItem('habits') || '[]');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            processItems(habits, tasks);
+         }
+
+         function processItems(habits, tasks) {
+            
+            // Combina toate elementele
+            var allItems = [];
+            
+            // Adauga obiectivele
+            habits.forEach(habit => {
+                allItems.push({
+                    id: `habit-${habit.id}`,
+                    name: habit.name,
+                    type: 'habit',
+                    completed: habit.completed || false,
+                    originalData: habit
+                });
+            });
+            
+            // Adauga task-urile
+            tasks.forEach(task => {
+                allItems.push({
+                    id: `task-${task.id}`,
+                    name: task.title,
+                    type: 'task',
+                    completed: task.completed || false,
+                    originalData: task
+                });
+            });
+
+            
+            console.log('All items loaded nigga:', allItems);
+            displayItems(allItems);
+            //updateStats();
+        }
+
+        function displayItems(allItems) {
+            const habitsList = document.getElementById('habitsList');
+            const tasksList = document.getElementById('tasksList');
+            
+            console.log('All items loaded nigga2:', allItems);
+
+            // Filtreaza elementele
+            const habits = allItems.filter(item => item.type === 'habit');
+            const tasks = allItems.filter(item => item.type === 'task');
+
+            console.log('Habits:', habits);
+            
+            // Afiseaza obiectivele
+            if (habits.length === 0) {
+                habitsList.innerHTML = '<div class="empty-state">Nu ai obiective adaugate</div>';
+            } else {
+                habitsList.innerHTML = habits.map(item => createItemHTML(item)).join('');
+            }
+            
+            // Afiseaza task-urile
+            if (tasks.length === 0) {
+                tasksList.innerHTML = '<div class="empty-state">Nu ai task-uri adaugate</div>';
+            } else {
+                tasksList.innerHTML = tasks.map(item => createItemHTML(item)).join('');
+            }
+        }
+
+        function createItemHTML(item) {
+            return `
+                <li class="item ${item.completed ? 'completed' : ''}" onclick="toggleItem('${item.id}')">
+                    <div class="item-content">
+                        <div class="item-checkbox ${item.completed ? 'checked' : ''}"></div>
+                        <div class="item-text">${item.name}</div>
+                    </div>
+                    <div class="item-type ${item.type}">${item.type === 'habit' ? 'Obiectiv' : 'Task'}</div>
+                </li>
+            `;
+        }
+
+        function toggleItem(itemId) {
+            const item = allItems.find(i => i.id === itemId);
+            if (item) {
+                item.completed = !item.completed;
+                
+                // Actualizeaza in localStorage
+                if (item.type === 'habit') {
+                    updateHabitInStorage(item);
+                } else {
+                    updateTaskInStorage(item);
+                }
+                
+                displayItems();
+                updateStats();
+            }
+        }
+
+        function updateHabitInStorage(item) {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                // Foloseste chrome.storage.sync
+                chrome.storage.sync.get({ habits: [] }, (data) => {
+                    const habits = data.habits;
+                    const habit = habits.find(h => h.id === item.originalData.id);
+                    if (habit) {
+                        habit.completed = item.completed;
+                        chrome.storage.sync.set({ habits: habits }, () => {
+                            console.log('Obiectiv actualizat in chrome.storage.sync');
+                        });
+                    }
+                });
+            } else {
+                // Fallback pentru localStorage
+                const habits = JSON.parse(localStorage.getItem('habits') || '[]');
+                const habit = habits.find(h => h.id === item.originalData.id);
+                if (habit) {
+                    habit.completed = item.completed;
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                }
+            }
+        }
+
+        function updateTaskInStorage(item) {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                // Foloseste chrome.storage.sync
+                chrome.storage.sync.get({ tasks: [] }, (data) => {
+                    const tasks = data.tasks;
+                    const task = tasks.find(t => t.id === item.originalData.id);
+                    if (task) {
+                        task.completed = item.completed;
+                        chrome.storage.sync.set({ tasks: tasks });
+                    }
+                });
+            } else {
+                // Fallback pentru localStorage
+                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                const task = tasks.find(t => t.id === item.originalData.id);
+                if (task) {
+                    task.completed = item.completed;
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                }
+            }
+        }
+
+        // function updateStats() {
+        //     const total = allItems.length;
+        //     const completed = allItems.filter(item => item.completed).length;
+        //     const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+        //     document.getElementById('totalItems').textContent = total;
+        //     document.getElementById('completedItems').textContent = completed;
+        //     document.getElementById('completionRate').textContent = rate + '%';
+
+        //     if(rate == 100){
+        //         // Trimite mesaj catre content script pentru a seta finish: true
+        //         if (typeof chrome !== 'undefined' && chrome.runtime) {
+        //             chrome.storage.sync.set({ finish: true }, () => {
+        //                 console.log('Progresul a fost finalizat!');
+        //             });
+        //         } else {
+        //             // Pentru contextul web, trimite mesaj catre content script
+        //             window.postMessage({ 
+        //                 type: 'SET_FINISH_FLAG', 
+        //                 data: { finish: true } 
+        //             }, '*');
+        //         }
+        //     }
+        // }
+
+        // Asculta mesaje de la content script
+        // window.addEventListener('message', (event) => {
+        //     if (event.data.type === 'PROGRESS_DATA') {
+        //         const { habits, tasks } = event.data.data;
+        //         processItems(habits, tasks);
+        //     }
+        // });
+
+        window.addEventListener('load',()=>{
+            // Trimite mesaj catre content script pentru a obtine datele initiale
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage({ type: 'GET_PROGRESS_DATA' });
+            } else {
+                // Pentru contextul web, trimite mesaj catre content script
+                window.postMessage({ type: 'GET_PROGRESS_DATA' }, '*');
+            }
+        });
+        
+        document.addEventListener("DOMContentLoaded", ()=> {
+            console.log('DOM fully loaded and parsed');
+            loadAllItems();
+           
+        });
+        
+    </script>
+</body>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 2.5em;
+        font-weight: 300;
+    }
+
+    .content {
+        padding: 30px;
+    }
+
+    .section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title.habits {
+        color: #667eea;
+    }
+
+    .section-title.tasks {
+        color: #28a745;
+    }
+
+    .section-icon {
+        font-size: 24px;
+    }
+
+    .item-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .item {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-color: #667eea;
+    }
+
+    .item.completed {
+        background: #e8f5e8;
+        border-color: #28a745;
+        opacity: 0.8;
+    }
+
+    .item-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+    }
+
+    .item-checkbox {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #667eea;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .item-checkbox.checked {
+        background: #667eea;
+        border-color: #667eea;
+    }
+
+    .item-checkbox.checked::after {
+        content: '✓';
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .item-text {
+        font-size: 18px;
+        font-weight: 500;
+        color: #495057;
+        flex: 1;
+    }
+
+    .item.completed .item-text {
+        text-decoration: line-through;
+        color: #6c757d;
+    }
+
+    .item-type {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .item-type.habit {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+
+    .item-type.task {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .stats {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .stats-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #6c757d;
+        font-size: 18px;
+        padding: 60px 20px;
+    }
+
+    .refresh-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .refresh-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+</style>
+</html>

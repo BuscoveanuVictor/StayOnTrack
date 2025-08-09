@@ -51,6 +51,7 @@
     <script>
         function toggleTaskForm() {
             const form = document.getElementById('taskForm');
+            // Toggle adauga clasa show daca elem nu o are sau o elimina daca o are
             form.classList.toggle('show');
             
             if (form.classList.contains('show')) {
@@ -97,9 +98,27 @@
                      });
                  });
              } else {
+                
+
                  const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
                  tasks.push(task);
                  localStorage.setItem('tasks', JSON.stringify(tasks));
+
+                
+
+                 fetch('/tasks/add_task', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify(tasks)
+                 })
+                 .then(response => response.json())
+                 .then(data => console.log('Răspuns de la server:', data))
+                 .catch(err => console.error('Eroare:', err));
+
+
+
                  displayTask(task);
                  resetForm();
              }
@@ -107,7 +126,7 @@
             // Afiseaza task-ul si reseteaza formularul se face in callback-ul de mai sus
         }
 
-                 function displayTask(task) {
+        function displayTask(task) {
              const tasksList = document.getElementById('tasksList');
              const taskElement = document.createElement('div');
              taskElement.className = 'task-item';
@@ -148,12 +167,29 @@
                     tasks.forEach(task => displayTask(task));
                 });
             } else {
+                //const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                
+                fetch('/tasks/load_tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Răspuns de la server:', data);
+                    // Actualizeaza localStorage cu datele primite de la server
+                    localStorage.setItem('tasks', JSON.stringify(data));
+                })
+                
                 const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                
+                
                 tasks.forEach(task => displayTask(task));
             }
         }
 
-                 function toggleComplete(taskId) {
+        function toggleComplete(taskId) {
              if (typeof chrome !== 'undefined' && chrome.runtime) {
                  chrome.storage.sync.get({ tasks: [] }, (data) => {
                      const tasks = data.tasks;
@@ -249,7 +285,8 @@
                      date: date,
                      time: time
                  };
-                 
+
+              
                  localStorage.setItem('tasks', JSON.stringify(tasks));
                  
                  // Reincarca lista
