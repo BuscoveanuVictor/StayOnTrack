@@ -10,6 +10,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.getElementById('blockBtn').addEventListener('click', () => {
             // Salvăm domeniul în lista de block   
+
+            fetch('http://localhost:5000/block_list/add_domain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ domain: hostname })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Domeniu adăugat:", data);
+                alert("Domeniul a fost adăugat cu succes la lista de blocare.");
+            })
+            .catch(error => {
+                console.error("Eroare la adăugarea domeniului:", error);
+                return;
+            });
+
+
+
             chrome.storage.sync.get({ blockedSites: [] }, (data) => {
                 const blocked = data.blockedSites;
                 if (!blocked.includes(hostname)) {
