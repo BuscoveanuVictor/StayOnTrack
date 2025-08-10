@@ -18,6 +18,16 @@ chrome.storage.sync.get({ habits: [], tasks: [] }, (data) => {
 
 // Asculta mesaje de la pagina web pentru actualizarea progress-ului
 window.addEventListener('message', (event) => {
+    if (event.data.type === 'UPDATE_BLOCK_LIST'){
+        const { blockedSites } = event.data.data;
+        console.log("Actualizare lista de site-uri blocate:", blockedSites);
+        // Salveaza in chrome.storage.sync
+        chrome.storage.sync.set({ blockedSites: blockedSites }, () => {
+            console.log('Lista de site-uri blocate actualizata in chrome.storage.sync');
+        });
+    }
+
+
     if (event.data.type === 'UPDATE_PROGRESS') {
         const { habits, tasks } = event.data.data;
         

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('blockBtn').addEventListener('click', () => {
             // Salvăm domeniul în lista de block   
 
-            fetch('http://localhost:5000/block_list/add_domain', {
+            fetch('http://localhost:5000/block-list/add-domain', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -246,3 +246,101 @@ body {
     background: #495057;
     transform: translateY(-2px);
 }
+
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .blockManager {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .blockedList {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    padding: 15px;
+  }
+  
+  .button {
+    background-color: #6a5acd; /* slate blue */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1.5px solid #ccc;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .modal {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    width: 350px;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .closeBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+  }
+  
+  .listItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  
+  .deleteBtn {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  

@@ -21,7 +21,7 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello World from API!' });
 });
 
-app.post('/block_list/add_domain', async (req, res) => {
+app.post('/block-list/add-domain', async (req, res) => {
     const { domain } = req.body; // extrage domain din body
     console.log("Received request to add domain:", domain);
     await db.collection('users').updateOne(
@@ -34,7 +34,7 @@ app.post('/block_list/add_domain', async (req, res) => {
     res.json({ message: "Domain added successfully" });
 });
 
-app.get('/blocked-sites.json', async (req, res) => {
+app.get('/block-list/blocked-sites.json', async (req, res) => {
     try {
         await db.collection('users').findOne({ nume: "Victor" }).then((user) => {
           res.json(
@@ -49,7 +49,20 @@ app.get('/blocked-sites.json', async (req, res) => {
     }
 });
 
-app.get('/blocked-sites.json/last_updated', async (req, res) => {
+app.delete('/block-list/remove-domain', async (req, res) => {
+    const { domain } = req.body; // extrage domain din body
+    console.log("Received request to remove domain:", domain);
+    await db.collection('users').updateOne(
+        { nume: "Victor" },
+        { 
+          $set: { "block_list.last_updated": Date.now()},
+          $pull: { "block_list.domains": domain } 
+        }
+    );
+    res.json({ message: "Domain removed successfully" });
+});
+
+app.get('/blocked-sites.json/last-updated', async (req, res) => {
     try {
         const user = await db.collection('users').findOne({ nume: "Victor" });
         if (user) {
