@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
 import BlockList from './pages/BlockList';
 import TaskTracker from './pages/TaskTracker';
-import Auth from './pages/Auth';
 
 function App() {
   return (
@@ -13,8 +12,8 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/block-list" element={<BlockList />} />
         <Route path="/tasks" element={<TaskTracker />} />
-        <Route path="/auth" element={<Auth />} />
-        
+        {/* <Route path="/habits" element={<HabitTracker />} />
+        <Route path="/progress-manager" element={<ProgressManager />} /> */}
       </Routes>
     </Router>
   );

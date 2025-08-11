@@ -81,7 +81,5 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         } catch (e) {
             console.error("Eroare la procesarea URL-ului:", e);
         }
-             
-        
     }
 });

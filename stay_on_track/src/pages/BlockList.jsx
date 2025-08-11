@@ -2,9 +2,7 @@ import React, { useEffect, useState }from 'react';
 import styles from './BlockList.module.css';
 import Modal from './Modal';
 
-
-
-function BlockList() {
+export default function BlockList() {
 
     const [blockList, setBlockList] = React.useState([]);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -44,6 +42,8 @@ function BlockList() {
 
         fetch('http://localhost:5000/block-list/add-domain',{
             method: 'POST',
+            credentials: 'include', // IMPORTANT pentru a trimite cookie-urile de sesiune 
+                                    // pentru a putea accesa sesiunea utilizatorului
             headers:{
                 'Content-Type': 'application/json'
             },
@@ -177,4 +177,3 @@ function BlockList() {
   );
 }
 
-export default BlockList;

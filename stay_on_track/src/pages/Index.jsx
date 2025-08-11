@@ -6,7 +6,7 @@ function Index() {
         <a href="habits">Habits</a>
         <a href="tasks">Tasks</a>
         <a href="block-list">Block list</a>
-        <a href="progress">Progress</a>
+        <a href="auth">Authentication</a>
     </div>
   );
 }
