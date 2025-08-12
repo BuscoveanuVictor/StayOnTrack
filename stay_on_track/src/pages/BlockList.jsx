@@ -4,9 +4,18 @@ import Modal from './Modal';
 
 export default function BlockList() {
 
+    // client blockList
     const [blockList, setBlockList] = React.useState([]);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [blockedDomain, setBlockedDomain] = React.useState('');
+
+    const saveOnLocalStorage = (data)=>{
+        localStorage.setItem('blockList', JSON.stringify(data));
+    }
+
+    /// AICI DE LUCRAT !!! 
+    // nu merge setBlockList(data.block_list);
+    // salveaza in memoria extensiei 
 
     const loadBlockList = () => {
 
@@ -19,14 +28,15 @@ export default function BlockList() {
         })
         .then(response => response.json())
         .then(data => {
-
-            console.log("Raspuns primit: ", data);
-            //blockList = data['block_list'] || [];
-
-            setBlockList(data.block_list || []);
-
-            localStorage.setItem('blockList', JSON.stringify(blockList));
-            console.log("Site-uri blocate incarcate!!!!:", blockList);
+            console.log(data.block_list)
+            setBlockList(data.block_list);
+            saveOnLocalStorage(data.block_list);
+        })
+        .catch((err)=>{
+            // In caz ca serverul nu rasp iau ce am salvat pe localStorage
+            localStorage.getItem('blockList', (res)=>{
+                setBlockList(res.blockList);
+            })
         })
     }
 
@@ -57,11 +67,11 @@ export default function BlockList() {
         .then(data => {
             console.log("Raspuns primit: ", data)
             setBlockList(blockList => [...blockList, domain]);
+            
+            window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: blockList }, '*');
         })
         .catch(err => console.error('Eroare:', err));
     }
-
-   
 
     const removeDomain = (domain)=> { 
         console.log("Sterg site-ul:", domain);
@@ -80,7 +90,6 @@ export default function BlockList() {
             if(status == 200 ){
                 console.log("Site-ul a fost sters cu succes:", domain);
                 setBlockList(blockList.filter(site => site !== domain));
-                localStorage.setItem('blockList', JSON.stringify(blockList));
             }
         })
         .catch(err => console.error('Eroare:', err));       
