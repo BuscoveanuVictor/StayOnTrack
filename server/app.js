@@ -45,12 +45,30 @@ mongoose.connect('mongodb://localhost:27017/StayOnTrack', {
   useUnifiedTopology: true,
 });
 
+const { MongoClient } = require('mongodb');
+const uri = "mongodb://localhost:27017/";
+const client = new MongoClient(uri);
+
+let db;
+client.connect().then(() => {
+    db = client.db("StayOnTrack");
+});
+
+
 // ****** SCHEMA ******
 const userSchema = new mongoose.Schema({
   googleId: String,
   displayName: String,
   email: String,
   photo: String,
+  block_list: { type: [String], default: [] },
+  task_list: { type: [Object], default: [] },
+  // habbits: [{
+  //   name: String,
+  //   frequency: Number, // numarul de zile intre care se repeta
+  //   last_completed: Date, // data ultimei completari
+  //   streak: Number // numarul de zile consecutive in care a fost completat
+  // }]
 });
 
 // ****** MODELE ******
@@ -119,83 +137,73 @@ app.get('/auth/google/callback',
     console.log("User authenticated:", req.user);
     res.redirect('/');
   }
-);
+)
 
-// Logout
-// app.get('/logout', (req, res) => {
-//   req.logout(() => {
-//     res.redirect('http://localhost:3000/');
-//   });
-// });
-
-
-// Database connection
-const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/";
-const client = new MongoClient(uri);
-
-let db;
-client.connect().then(() => {
-    db = client.db("StayOnTrack");
-});
-
-app.post('/block-list/add-domain', async (req, res) => {
-    console.log("User is authenticated:", req.user);
-    
-    const { domain } = req.body; // extrage domain din body
-    console.log("Received request to add domain:", domain);
-    await db.collection('users').updateOne(
-        { nume: "Victor" },
-        { 
-          $set: { "block_list.last_updated": Date.now()},
-          $push: { "block_list.domains": domain } 
-        }
-    );
-    res.json({ message: "Domain added successfully" });
+app.get('/auth/check', (req, res) => {
+  //console.log(req.isAuthenticated())
+  res.json({
+    authentificated: req.isAuthenticated()
+  });
 });
 
 app.get('/block-list/blocked-sites.json', async (req, res) => {
-    try {
-        await db.collection('users').findOne({ nume: "Victor" }).then((user) => {
-          res.json(
-            {
-              block_list: user.block_list.domains || [],
-              last_updated: user.block_list.last_updated || Date.now()
-            });
-        });
-    } catch (error) {
-        console.error("Error fetching blocked sites:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+
+  const user = await db.collection('users').findOne({ _id: req.user._id });
+  res.json({block_list: user.block_list || []});
+
+});
+
+app.post('/block-list/add-domain', async (req, res) => {
+
+    console.log("User is authenticated:", req.user);
+    const { domain } = req.body; // extrage domain din body
+
+    console.log("Received request to add domain:", domain);
+    await db.collection('users').updateOne(
+        { _id : req.user._id }, // folosim _id-ul userului autentificat
+        { 
+          $push: { "block_list": domain } 
+        }
+    );
+    res.json({ message: "Domain added successfully" });
+
 });
 
 app.delete('/block-list/remove-domain', async (req, res) => {
-    const { domain } = req.body; // extrage domain din body
-    console.log("Received request to remove domain:", domain);
-    await db.collection('users').updateOne(
-        { nume: "Victor" },
-        { 
-          $set: { "block_list.last_updated": Date.now()},
-          $pull: { "block_list.domains": domain } 
-        }
-    );
-    res.json({ message: "Domain removed successfully" });
+  console.log("User is authenticated:", req.user);
+  const { domain } = req.body; // extrage domain din body
+  console.log("Received request to remove domain:", domain);
+  await db.collection('users').updateOne(
+      { _id : req.user._id }, // folosim _id-ul userului autentificat
+      {
+        $pull: { "block_list" : domain }
+      }
+  );
+  res.status(200).send(); // trimite un raspuns de succes
 });
 
-app.get('/blocked-sites.json/last-updated', async (req, res) => {
-    try {
-        const user = await db.collection('users').findOne({ nume: "Victor" });
-        if (user) {
-            res.json({ last_updated: user.block_list.last_updated || Date.now() });
-        } else {
-            res.status(404).json({ error: 'User not found' });
+app.get('/task-list/tasks.json', async (req, res) => {
+  console.log("SALUT USER:", req.user);
+  const user = await db.collection('users').findOne({ _id: req.user._id });
+    res.json({task_list : user.task_list || []}
+  );
+  // res.json({
+  //   tasks: user.task_list.tasks || [],
+  //   last_updated: user.task_list.last_updated || Date.now()
+  // });
+})
+
+app.post('/task-list/update', async (req, res) => {
+    const { task_list } = req.body; // extrage task din body
+    console.log("Received request to update task_list:", task_list);
+    await db.collection('users').updateOne(
+        { _id : req.user._id }, // folosim _id-ul userului autentificat
+        { 
+          $set: { "task_list": task_list } 
         }
-    } catch (error) {
-        console.error("Error fetching last updated time:", error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-);
+    );
+    res.json({ message: "Task list updated successfully" });
+});
 
 app.listen(5000, () => {
   console.log('Server running on port 5000');

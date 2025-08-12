@@ -9,8 +9,10 @@ export default function BlockList() {
     const [blockedDomain, setBlockedDomain] = React.useState('');
 
     const loadBlockList = () => {
+
         fetch('/block-list/blocked-sites.json',{
             method: 'GET',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -65,6 +67,7 @@ export default function BlockList() {
         console.log("Sterg site-ul:", domain);
         fetch(`http://localhost:5000/block-list/remove-domain`,{
             method: 'DELETE',
+            credentials: 'include', 
             headers:{
                 'Content-Type': 'application/json'
             },
@@ -72,10 +75,13 @@ export default function BlockList() {
                 domain: domain
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            setBlockList(blockList.filter(site => site !== domain));
-            localStorage.setItem('blockList', JSON.stringify(blockList));
+        .then(response => response.status)
+        .then((status) => {
+            if(status == 200 ){
+                console.log("Site-ul a fost sters cu succes:", domain);
+                setBlockList(blockList.filter(site => site !== domain));
+                localStorage.setItem('blockList', JSON.stringify(blockList));
+            }
         })
         .catch(err => console.error('Eroare:', err));       
     }

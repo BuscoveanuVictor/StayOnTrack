@@ -10,7 +10,6 @@ export default function TaskTracker() {
     time: "",
     duration: "",  // nou
   });
-
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
@@ -18,30 +17,47 @@ export default function TaskTracker() {
   }, []);
 
   const loadTasks = () => {
-    const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    setTasks(savedTasks);
-  };
-
-  const saveTasks = (newTasks) => {
-    setTasks(newTasks);
-    localStorage.setItem("tasks", JSON.stringify(newTasks));
-  };
-
-  const toggleTaskForm = () => {
-    setShowForm((prev) => !prev);
-    if (!showForm) {
-      setFormData({
-        ...formData,
-        date: new Date().toISOString().split("T")[0],
-      });
-    }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    
+    fetch("http://localhost:5000/task-list/tasks.json",{
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      setTasks(data.task_list);
+    }).catch((error) => {
+      console.error("Eroare la incarcarea task-urilor de pe server:", error)
+      // Incarca task-urile din localStorage ca fallback
+      setTasks(JSON.parse(localStorage.getItem("tasks") || "[]"));
     });
+
+  };
+
+  const saveTasks = (tasks) => {
+    setTasks(tasks);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    fetch("http://localhost:5000/task-list/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        task_list: tasks,
+      }),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Task list updated successfully:", data.message);
+    })
+    .catch((error) => {
+      console.error("Eroare la actualizarea task-urilor pe server:", error);
+    });
+
   };
 
   const addTask = () => {
@@ -57,21 +73,13 @@ export default function TaskTracker() {
     const newTask = {
       id: Date.now(),
       title: formData.title,
-      description: formData.description,
-      date: formData.date,
-      time: formData.time,
-      completed: false,
+      description: formData.description || "",
+      dueDate: formData.date,
+      completed: false
     };
 
     saveTasks([...tasks, newTask]);
     resetForm();
-  };
-
-  const toggleComplete = (id) => {
-    const updated = tasks.map((t) =>
-      t.id === id ? { ...t, completed: !t.completed } : t
-    );
-    saveTasks(updated);
   };
 
   const deleteTask = (id) => {
@@ -102,6 +110,34 @@ export default function TaskTracker() {
     resetForm();
   };
 
+
+
+  const toggleTaskForm = () => {
+    setShowForm((prev) => !prev);
+    if (!showForm) {
+      setFormData({
+        ...formData,
+        date: new Date().toISOString().split("T")[0],
+      });
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  
+  const toggleComplete = (id) => {
+    const updated = tasks.map((t) =>
+      t.id === id ? { ...t, completed: !t.completed } : t
+    );
+    saveTasks(updated);
+  };
+
+  
   const resetForm = () => {
     setFormData({
       title: "",
@@ -228,12 +264,14 @@ export default function TaskTracker() {
                     }
                   >
 
-{task.duration && task.duration > 0 && (
-    <span style={{ marginRight: 8, color: "#666" }}>
-      {task.duration} min
-    </span>
-  )}
+                  {task.duration && task.duration > 0 && (
+                    <span style={{ marginRight: 8, color: "#666" }}>
+                      {task.duration} min
+                    </span>
+                  )}
+
                     {task.title}
+
                   </div>
                   {task.description && (
                     <div style={styles.taskDescription}>
