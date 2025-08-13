@@ -11,14 +11,7 @@
         "activeTab",
         "tabs"
     ],
-
-   "web_accessible_resources": [
-        {
-            "resources": ["blocked.html"],
-            "matches": ["<all_urls>"]
-        }
-    ],
-
+    
     "background": {
         "service_worker": "background.js"
     },

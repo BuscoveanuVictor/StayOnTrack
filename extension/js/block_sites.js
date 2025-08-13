@@ -1,12 +1,7 @@
-function localSave(hostname){
-    chrome.storage.sync.get({ blockedSites: [] }, (data) => {
-        const blocked = data.blockedSites;
-        if (!blocked.includes(hostname)) {
-            blocked.push(hostname);
-            chrome.storage.sync.set({ blockedSites: blocked });
-        }
-    });
+function updateBlockList(){
+
 }
+
 
 function remoteSave(hostname){
     fetch('http://localhost:5000/block-list/add-domain', {
@@ -53,29 +48,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
         domainElement.textContent = 'Invalid URL';
     }
-});
-
-window.addEventListener('message', (event) => {
-    
-    if (event.data.type === 'UPDATE_BLOCK_LIST'){
-        console.log("SALUT")
-        // chrome.storage.sync.set({ blockList : event.data.blockList }, () => {
-        //     console.log("Date salvate în sync storage!");
-        // });
-    }
-    // if (event.data.type === 'UPDATE_PROGRESS') {
-    //     const { habits, tasks } = event.data.data;
-        
-    //     // Salveaza in chrome.storage.sync
-    //     
-
-    // // Asculta mesaje pentru setarea flag-ului finish
-    // if (event.data.type === 'SET_FINISH_FLAG') {
-    //     const { finish } = event.data.data;
-        
-    //     // Salveaza in chrome.storage.sync
-    //     chrome.storage.sync.set({ finish: finish }, () => {
-    //         console.log('Flag finish setat in chrome.storage.sync:', finish);
-    //     });
-    // }
 });

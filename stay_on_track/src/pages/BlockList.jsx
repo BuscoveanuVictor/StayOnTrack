@@ -5,20 +5,30 @@ import Modal from './Modal';
 export default function BlockList() {
 
     // client blockList
-    const [blockList, setBlockList] = React.useState([]);
-    const [isModalOpen, setIsModalOpen] = React.useState(false);
-    const [blockedDomain, setBlockedDomain] = React.useState('');
+    const [blockList, setBlockList] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [blockedDomain, setBlockedDomain] = useState('');
 
-    const saveOnLocalStorage = (data)=>{
-        localStorage.setItem('blockList', JSON.stringify(data));
+
+    const updateLocalBlockList = (list) => {
+        // !!! Atentie setBlockList este asincron
+        // adica blockList se actualizeaza dupa ce
+        // functia componenta se termian
+        setBlockList(list);
+        updateLocalStorageBlockList(list);
+        updateExtensionBlockList(list);
     }
 
-    /// AICI DE LUCRAT !!! 
-    // nu merge setBlockList(data.block_list);
-    // salveaza in memoria extensiei 
+    // Pentru atunci cand userul nu are internet
+    const updateLocalStorageBlockList = (blockList) => {
+        localStorage.setItem('blockList', JSON.stringify(blockList));
+    }
+
+    const updateExtensionBlockList = (data) => {
+        window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: data }, 'http://localhost:3000');
+    }
 
     const loadBlockList = () => {
-
         fetch('/block-list/blocked-sites.json',{
             method: 'GET',
             credentials: 'include',
@@ -28,9 +38,8 @@ export default function BlockList() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data.block_list)
-            setBlockList(data.block_list);
-            saveOnLocalStorage(data.block_list);
+            //console.log("Received:", data.block_list);
+            updateLocalBlockList(data.block_list);
         })
         .catch((err)=>{
             // In caz ca serverul nu rasp iau ce am salvat pe localStorage
@@ -39,7 +48,6 @@ export default function BlockList() {
             })
         })
     }
-
   
     const addToBlockList = (domain) => {
         if (!domain) {
@@ -52,6 +60,9 @@ export default function BlockList() {
             return;
         }
 
+        updateLocalBlockList([...blockList, domain]);
+
+        // remote
         fetch('http://localhost:5000/block-list/add-domain',{
             method: 'POST',
             credentials: 'include', // IMPORTANT pentru a trimite cookie-urile de sesiune 
@@ -64,47 +75,32 @@ export default function BlockList() {
             })
         })
         .then(response => response.json())
-        .then(data => {
-            console.log("Raspuns primit: ", data)
-            setBlockList(blockList => [...blockList, domain]);
-            
-            window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: blockList }, '*');
-        })
+        .then(data => console.log(data))
         .catch(err => console.error('Eroare:', err));
     }
 
     const removeDomain = (domain)=> { 
-        console.log("Sterg site-ul:", domain);
-        fetch(`http://localhost:5000/block-list/remove-domain`,{
+        updateLocalBlockList(blockList.filter(site => site !== domain));
+        fetch(`http://localhost:5000/block-list/remove/${domain}`,{
             method: 'DELETE',
             credentials: 'include', 
             headers:{
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                domain: domain
-            })
+            }
         })
         .then(response => response.status)
         .then((status) => {
-            if(status == 200 ){
+            if(status === 200 ){
                 console.log("Site-ul a fost sters cu succes:", domain);
-                setBlockList(blockList.filter(site => site !== domain));
             }
         })
         .catch(err => console.error('Eroare:', err));       
     }
 
     useEffect(()=> {
-        blockList.map((item, index) => (
-            <li key={index} className={styles.blockedItem}>
-                <span className={styles.siteName}>🌐 {item}</span>
-                <button className={styles.removeBtn} onClick={() => removeDomain(item)}>Sterge</button>
-            </li>
-        ))
         // Incarca site-urile blocate la pornirea paginii
         loadBlockList();
-    }, []);
+    },[]);
     
 
     const handleSave = () => {

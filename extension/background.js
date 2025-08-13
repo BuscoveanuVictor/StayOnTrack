@@ -1,14 +1,14 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    //console.log("Tab updated:", tabId, changeInfo, tab);
-    if (changeInfo.status === 'loading' ||
-         changeInfo.status === 'complete' && tab.active && tab.url) 
+    if (changeInfo.status === 'loading' || changeInfo.status === 'complete' && tab.active && tab.url) 
     {
         try {
             const urlObj = new URL(tab.url);
             const hostname = urlObj.hostname;
+
+            console.log(hostname)
             
-            chrome.storage.sync.get(['blockedSites'], (res) => {
-                if(res.blockedSites.includes(hostname))
+            chrome.storage.sync.get(['blockList'], (data) => {
+                if(data.blockList.includes(hostname))
                     chrome.tabs.update(tabId, { url: "http://localhost:3000"}); 
             })
 
@@ -17,29 +17,3 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         }
     }
 });
-
-// Asculta mesaje de la pagina web pentru actualizare
-// window.addEventListener('message', (event) => {
-    
-//     if (event.data.type === 'UPDATE_BLOCK_LIST'){
-//         console.log("SALUT")
-        // chrome.storage.sync.set({ blockList : event.data.blockList }, () => {
-        //     console.log("Date salvate în sync storage!");
-        // });
-    //}
-    // if (event.data.type === 'UPDATE_PROGRESS') {
-    //     const { habits, tasks } = event.data.data;
-        
-    //     // Salveaza in chrome.storage.sync
-    //     
-
-    // // Asculta mesaje pentru setarea flag-ului finish
-    // if (event.data.type === 'SET_FINISH_FLAG') {
-    //     const { finish } = event.data.data;
-        
-    //     // Salveaza in chrome.storage.sync
-    //     chrome.storage.sync.set({ finish: finish }, () => {
-    //         console.log('Flag finish setat in chrome.storage.sync:', finish);
-    //     });
-    // }
-// });

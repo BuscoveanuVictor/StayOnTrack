@@ -169,9 +169,8 @@ app.post('/block-list/add-domain', async (req, res) => {
 
 });
 
-app.delete('/block-list/remove-domain', async (req, res) => {
-  console.log("User is authenticated:", req.user);
-  const { domain } = req.body; // extrage domain din body
+app.delete('/block-list/remove/:domain', async (req, res) => {
+  const domain = req.params.domain;
   console.log("Received request to remove domain:", domain);
   await db.collection('users').updateOne(
       { _id : req.user._id }, // folosim _id-ul userului autentificat
@@ -183,14 +182,9 @@ app.delete('/block-list/remove-domain', async (req, res) => {
 });
 
 app.get('/task-list/tasks.json', async (req, res) => {
-  console.log("SALUT USER:", req.user);
   const user = await db.collection('users').findOne({ _id: req.user._id });
     res.json({task_list : user.task_list || []}
   );
-  // res.json({
-  //   tasks: user.task_list.tasks || [],
-  //   last_updated: user.task_list.last_updated || Date.now()
-  // });
 })
 
 app.post('/task-list/update', async (req, res) => {

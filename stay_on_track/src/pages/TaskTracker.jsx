@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function TaskTracker() {
-  const [tasks, setTasks] = useState([]);
+  const [taskList, setTaskList] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -16,6 +16,51 @@ export default function TaskTracker() {
     loadTasks();
   }, []);
 
+  const updateTaskList = (list) => {
+    localUpdateTaskList(list);
+    remoteUpdateTaskList(list);
+  }
+  const updateExtensionTaskList = (list) => {
+      window.postMessage({ type: 'UPDATE_TASK_LIST', taskList: list }, 'http://localhost:3000');
+  }
+
+  const updateLocalStorageTaskList = (list) => {
+    setTaskList(list);
+    localStorage.setItem("taskList", JSON.stringify(list));
+  }
+
+  const localUpdateTaskList = (list) => {
+    // !!! Atentie setBlockList este asincron
+    // adica blockList se actualizeaza dupa ce
+    // functia componenta se termian
+    setTaskList(list);
+    updateLocalStorageTaskList(list);
+    updateExtensionTaskList(list);
+  }
+
+  const remoteUpdateTaskList = (list) => {
+    // se da update si la lista locala 
+    fetch("http://localhost:5000/task-list/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        task_list: list,
+      }),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Task list updated successfully:", data.message);
+    })
+    .catch((error) => {
+      console.error("Eroare la actualizarea task-urilor pe server:", error);
+    });
+
+  };
+
+
   const loadTasks = () => {
     
     fetch("http://localhost:5000/task-list/tasks.json",{
@@ -26,36 +71,11 @@ export default function TaskTracker() {
       },
     })
     .then((res) => res.json())
-    .then((data) => {
-      setTasks(data.task_list);
-    }).catch((error) => {
+    .then((data) => localUpdateTaskList(data.task_list))
+    .catch((error) => {
       console.error("Eroare la incarcarea task-urilor de pe server:", error)
       // Incarca task-urile din localStorage ca fallback
-      setTasks(JSON.parse(localStorage.getItem("tasks") || "[]"));
-    });
-
-  };
-
-  const saveTasks = (tasks) => {
-    setTasks(tasks);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-
-    fetch("http://localhost:5000/task-list/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        task_list: tasks,
-      }),
-    })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Task list updated successfully:", data.message);
-    })
-    .catch((error) => {
-      console.error("Eroare la actualizarea task-urilor pe server:", error);
+      setTaskList(JSON.parse(localStorage.getItem("tasks") || "[]"));
     });
 
   };
@@ -78,18 +98,18 @@ export default function TaskTracker() {
       completed: false
     };
 
-    saveTasks([...tasks, newTask]);
+    localUpdateTaskList([...taskList, newTask]);
     resetForm();
   };
 
   const deleteTask = (id) => {
     if (window.confirm("Esti sigur ca vrei sa stergi acest task?")) {
-      saveTasks(tasks.filter((t) => t.id !== id));
+        updateTaskList(taskList.filter((t) => t.id !== id));
     }
   };
 
   const editTask = (id) => {
-    const task = tasks.find((t) => t.id === id);
+    const task = taskList.find((t) => t.id === id);
     if (task) {
       setFormData({
         title: task.title,
@@ -103,10 +123,9 @@ export default function TaskTracker() {
   };
 
   const updateTask = () => {
-    const updated = tasks.map((t) =>
+    updateTaskList(taskList.map((t) => 
       t.id === editId ? { ...t, ...formData } : t
-    );
-    saveTasks(updated);
+    ));
     resetForm();
   };
 
@@ -131,13 +150,11 @@ export default function TaskTracker() {
 
   
   const toggleComplete = (id) => {
-    const updated = tasks.map((t) =>
+    updateTaskList(taskList.map((t) =>
       t.id === id ? { ...t, completed: !t.completed } : t
-    );
-    saveTasks(updated);
+    ));
   };
 
-  
   const resetForm = () => {
     setFormData({
       title: "",
@@ -239,7 +256,7 @@ export default function TaskTracker() {
         )}
 
         <div style={styles.tasksList}>
-          {tasks.map((task) => {
+          {taskList.map((task) => {
             const dateTime = new Date(
               `${task.date} ${task.time || "00:00"}`
             ).toLocaleString("ro-RO", {
