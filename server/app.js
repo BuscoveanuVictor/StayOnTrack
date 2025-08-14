@@ -146,7 +146,7 @@ app.get('/auth/check', (req, res) => {
   });
 });
 
-app.get('/block-list/blocked-sites.json', async (req, res) => {
+app.get('/block-list/block-list.json', async (req, res) => {
 
   const user = await db.collection('users').findOne({ _id: req.user._id });
   res.json({block_list: user.block_list || []});
@@ -181,7 +181,7 @@ app.delete('/block-list/remove/:domain', async (req, res) => {
   res.status(200).send(); // trimite un raspuns de succes
 });
 
-app.get('/task-list/tasks.json', async (req, res) => {
+app.get('/task-list/task-list.json', async (req, res) => {
   const user = await db.collection('users').findOne({ _id: req.user._id });
     res.json({task_list : user.task_list || []}
   );
