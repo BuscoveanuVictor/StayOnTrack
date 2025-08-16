@@ -6,7 +6,6 @@ services:
     ports:
       - "80:80"
     environment:
-      # URL complet al API-ului, browser-ul va face request direct aici
       - REACT_APP_API_URL=http://stayontrack.site:5000
 
   api:

@@ -1,7 +1,5 @@
-export default function Auth() {
-    // console.log("SALUTTT!")
-   // În JavaScript front-end (exemplu simplu)
-    // fetch('http://localhost:5000/auth/google');
-    window.location.href = 'http://localhost:5000/auth/google';
+const API_URL = process.env.REACT_APP_API_URL;
 
+export default function Auth() {
+    window.location.href = `${API_URL}/auth/google`;
 }
