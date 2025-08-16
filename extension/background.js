@@ -4,12 +4,15 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         try {
             const urlObj = new URL(tab.url);
             const hostname = urlObj.hostname;
-
-            console.log(hostname)
-            
+            //console.log(hostname)
             chrome.storage.sync.get(['blockList'], (data) => {
-                if(data.blockList.includes(hostname))
-                    chrome.tabs.update(tabId, { url: "http://localhost:3000"}); 
+                if(data.blockList.includes(hostname)){
+                    chrome.storage.sync.get(['taskList'], (data)=>{
+                        if(data.taskList.find(elem => elem.completed == false)){
+                            chrome.tabs.update(tabId, { url: "http://localhost:3000"});
+                        }
+                    })
+                }
             })
 
         } catch (e) {

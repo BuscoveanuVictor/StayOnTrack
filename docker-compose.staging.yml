@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  web:
+    image: buscoveanuvictor/stay_on_track_web:latest
+    ports:
+      - "80:80"
+    environment:
+      # URL complet al API-ului, browser-ul va face request direct aici
+      - REACT_APP_API_URL=http://stayontrack.site:5000
+
+  api:
+    image: buscoveanuvictor/stay_on_track_api:latest
+    ports:
+      - "5000:5000"
+    environment:
+      # Variabile de mediu pentru autentificare și conexiuni
+      - CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - DB_SERVER_URL=mongodb://db:27017/StayOnTrack
+      - WEB_SERVER_URL=http://stayontrack.site:80
+      - API_SERVER_URL=http://stayontrack.site:5000
+    env_file:
+      - ./server/.env
+
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+

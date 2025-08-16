@@ -1,51 +1,42 @@
 import React, { useEffect, useState }from 'react';
 import styles from './BlockList.module.css';
 import Modal from './Modal';
+import useListManager from './ListManager';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default function BlockList() {
-
+    
     // client blockList
-    const [blockList, setBlockList] = useState([]);
+    const [blockList, setBlockList ] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [blockedDomain, setBlockedDomain] = useState('');
+    
+    const { loadList : loadList} = useListManager({page : "block-list"});
 
+    // const { list: blockList, updateList: updateBlockList } = useListManager({
+    //     fetchUrl: "/block-list/blocked-sites.json",
+    //     updateUrl: "http://localhost:5000/block-list/update",
+    //     localStorageKey: "blockList",
+    //     messageType: "UPDATE_BLOCK_LIST"
+    // });
 
     const updateLocalBlockList = (list) => {
         // !!! Atentie setBlockList este asincron
         // adica blockList se actualizeaza dupa ce
         // functia componenta se termian
         setBlockList(list);
-        updateLocalStorageBlockList(list);
         updateExtensionBlockList(list);
     }
 
-    // Pentru atunci cand userul nu are internet
-    const updateLocalStorageBlockList = (blockList) => {
-        localStorage.setItem('blockList', JSON.stringify(blockList));
-    }
-
     const updateExtensionBlockList = (data) => {
-        window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: data }, 'http://localhost:3000');
+        window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: data }, API_URL);
     }
 
     const loadBlockList = () => {
-        fetch('/block-list/blocked-sites.json',{
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            //console.log("Received:", data.block_list);
-            updateLocalBlockList(data.block_list);
-        })
-        .catch((err)=>{
-            // In caz ca serverul nu rasp iau ce am salvat pe localStorage
-            localStorage.getItem('blockList', (res)=>{
-                setBlockList(res.blockList);
-            })
+        loadList().then((res)=>{
+            console.log(res.block_list)
+            updateLocalBlockList(res.block_list);
         })
     }
   
@@ -63,7 +54,7 @@ export default function BlockList() {
         updateLocalBlockList([...blockList, domain]);
 
         // remote
-        fetch('http://localhost:5000/block-list/add-domain',{
+        fetch(`${API_URL}/block-list/add-domain`,{
             method: 'POST',
             credentials: 'include', // IMPORTANT pentru a trimite cookie-urile de sesiune 
                                     // pentru a putea accesa sesiunea utilizatorului
@@ -81,7 +72,7 @@ export default function BlockList() {
 
     const removeDomain = (domain)=> { 
         updateLocalBlockList(blockList.filter(site => site !== domain));
-        fetch(`http://localhost:5000/block-list/remove/${domain}`,{
+        fetch(`${API_URL}/block-list/remove/${domain}`,{
             method: 'DELETE',
             credentials: 'include', 
             headers:{
