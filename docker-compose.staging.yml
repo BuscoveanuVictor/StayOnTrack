@@ -20,11 +20,9 @@ services:
       - DB_SERVER_URL=mongodb://db:27017/StayOnTrack
       - WEB_SERVER_URL=http://stayontrack.site:80
       - API_SERVER_URL=http://stayontrack.site:5000
-    env_file:
-      - ./server/.env
 
   db:
-    image: mongo:latest
+    image: mongo:6.0
     ports:
       - "27017:27017"
     volumes:

@@ -44,7 +44,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            export CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} 
+            export CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} 
+
             docker pull $IMAGE_WEB:latest
             docker pull $IMAGE_API:latest
-            docker-compose down
-            docker-compose up -d
+            docker-compose -f docker-compose.staging.yml down
+            docker-compose -f docker-compose.staging.yml up -d
