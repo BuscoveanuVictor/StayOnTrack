@@ -1,18 +1,3 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.pyc
-*.pdb
-*.egg-info/
-
-# Flask
-instance/
-.env
-*.env
-*.sqlite3
-db.sqlite3
 
 # VSCode/IDE
 .vscode/
@@ -24,22 +9,17 @@ db.sqlite3
 Thumbs.db
 Desktop.ini
 
-# Node/npm (daca folosesti pentru extensie)
+# Node/npm 
 node_modules/
 
 # Chrome Extension build artifacts
 *.crx
 *.pem
 
-# Logs
-*.log
-
-# Personal
-.DS_Store
 
 # Alte fisiere temporare
 *.bak
 *.tmp
 
-# Exclude fisierele de configurare personale
-*.local
+config.js
+.env

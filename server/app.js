@@ -11,13 +11,16 @@ const MongoStore = require('connect-mongo');
 // ****** APLICATIE EXPRESS ******
 const app = express();
 
-// ****** CONSTANATE ******
-const { CLIENT_ID, CLIENT_SECRET } = require('./config'); 
-const REDIRECT_URI = 'http://localhost:5000/auth/google/callback'; // URL-ul de redirect după autentificare
+// ****** VARIABILE DE ENV ******
+const CLIENT_ID = process.env.CLIENT_ID; 
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const DB_SERVER_URL = process.env.DB_SERVER_URL; 
+const WEB_SERVER_URL = process.env.WEB_SERVER_URL;
+const API_SERVER_URL = process.env.API_SERVER_URL;
 
 // ****** MODULE UTILIZATE ******
 app.use(cors({
-  origin: 'http://localhost:3000',  
+  origin: WEB_SERVER_URL,  
   credentials: true   
 }));
 // Aici folosesti modulul json din biblioteca express pentru a putea procesa JSON
@@ -28,7 +31,7 @@ app.use(session({
   secret: 'secretulmeu',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/StayOnTrack' }),
+  store: MongoStore.create({ mongoUrl: DB_SERVER_URL }),
   cookie: {
     httpOnly: true,
     secure: false,  // true doar pe HTTPS
@@ -40,13 +43,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ****** BAZA DE DATE ******
-mongoose.connect('mongodb://localhost:27017/StayOnTrack', {
+mongoose.connect(DB_SERVER_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/";
+const uri = DB_SERVER_URL;
 const client = new MongoClient(uri);
 
 let db;
@@ -81,7 +84,7 @@ const User = mongoose.model('User', userSchema);
 passport.use(new GoogleStrategy({
   clientID: CLIENT_ID,
   clientSecret: CLIENT_SECRET,
-  callbackURL: REDIRECT_URI,
+  callbackURL: `${API_SERVER_URL}/auth/google/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
 
   // Aici verificam daca userul exista deja in baza noastra de date
@@ -119,7 +122,7 @@ passport.deserializeUser(async (id, done) => {
 
 // ****** RUTE ******
 app.get('/', (req, res) => { 
-  res.redirect('http://localhost:3000/');
+  res.redirect(WEB_SERVER_URL);
 })
 
 // Auth cu google
@@ -147,10 +150,8 @@ app.get('/auth/check', (req, res) => {
 });
 
 app.get('/block-list/block-list.json', async (req, res) => {
-
   const user = await db.collection('users').findOne({ _id: req.user._id });
   res.json({block_list: user.block_list || []});
-
 });
 
 app.post('/block-list/add-domain', async (req, res) => {

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import useListManager from './ListManager';
+import { API_URL } from '../config.js' 
 
 export default function TaskTracker() {
   const [taskList, setTaskList] = useState([]);
@@ -12,6 +14,10 @@ export default function TaskTracker() {
   });
   const [editId, setEditId] = useState(null);
 
+
+  const { loadList } = useListManager({page : "task-list"});
+
+
   useEffect(() => {
     loadTasks();
   }, []);
@@ -20,6 +26,7 @@ export default function TaskTracker() {
     localUpdateTaskList(list);
     remoteUpdateTaskList(list);
   }
+
   const updateExtensionTaskList = (list) => {
       window.postMessage({ type: 'UPDATE_TASK_LIST', taskList: list }, 'http://localhost:3000');
   }
@@ -40,7 +47,7 @@ export default function TaskTracker() {
 
   const remoteUpdateTaskList = (list) => {
     // se da update si la lista locala 
-    fetch("http://localhost:5000/task-list/update", {
+    fetch(`${API_URL}/task-list/update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,22 +69,9 @@ export default function TaskTracker() {
 
 
   const loadTasks = () => {
-    
-    fetch("http://localhost:5000/task-list/tasks.json",{
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    loadList().then(res => {
+      localUpdateTaskList(res.task_list);
     })
-    .then((res) => res.json())
-    .then((data) => localUpdateTaskList(data.task_list))
-    .catch((error) => {
-      console.error("Eroare la incarcarea task-urilor de pe server:", error)
-      // Incarca task-urile din localStorage ca fallback
-      setTaskList(JSON.parse(localStorage.getItem("tasks") || "[]"));
-    });
-
   };
 
   const addTask = () => {
@@ -98,7 +92,7 @@ export default function TaskTracker() {
       completed: false
     };
 
-    localUpdateTaskList([...taskList, newTask]);
+    updateTaskList([...taskList, newTask]);
     resetForm();
   };
 

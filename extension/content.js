@@ -5,10 +5,12 @@ window.addEventListener('message', (event) => {
             console.log("Block list salvat în sync storage!");
         });
     }
+
     if (event.data.type === 'UPDATE_TASK_LIST'){
         console.log(event.data.taskList)
         chrome.storage.sync.set({ taskList : event.data.taskList }, () => {
             console.log("Task list salvat în sync storage!");
         });
     }
+ 
 });
