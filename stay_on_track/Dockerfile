@@ -4,7 +4,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ENV REACT_APP_API_URL=http://backend:5000
 RUN npm run build
+
 
 # Serve stage
 FROM nginx:alpine
