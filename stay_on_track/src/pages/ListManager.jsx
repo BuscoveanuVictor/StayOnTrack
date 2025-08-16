@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { API_URL } from '../config.js' 
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 function useListManager({ page }) {
     const [list, setList] = useState([]);

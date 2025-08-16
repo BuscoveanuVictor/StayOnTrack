@@ -5,13 +5,15 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
-
+const MongoStore = require('connect-mongo')
 
 // ****** APLICATIE EXPRESS ******
 const app = express();
 
 // ****** VARIABILE DE ENV ******
+
+require('dotenv').config();
+
 const CLIENT_ID = process.env.CLIENT_ID; 
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const DB_SERVER_URL = process.env.DB_SERVER_URL; 

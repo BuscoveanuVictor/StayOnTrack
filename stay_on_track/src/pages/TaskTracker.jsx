@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import useListManager from './ListManager';
-import { API_URL } from '../config.js' 
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default function TaskTracker() {
   const [taskList, setTaskList] = useState([]);
