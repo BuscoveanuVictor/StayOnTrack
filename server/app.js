@@ -25,7 +25,9 @@ app.use(cors({
   origin: WEB_SERVER_URL,  
   credentials: true   
 }));
-// Aici folosesti modulul json din biblioteca express pentru a putea procesa JSON
+// Aici folosesti modulul json 
+// din biblioteca express 
+// pentru a putea procesa JSON
 app.use(express.json());
 
 // Configurare sesiuni
@@ -82,7 +84,9 @@ const userSchema = new mongoose.Schema({
 // o colectie numita users  daca nu exista o creeaza automat 
 const User = mongoose.model('User', userSchema);
 
-// ****** Configurare Google OAuth2 ******
+
+// ****** CONFIGURARE Google OAuth2 ******
+
 passport.use(new GoogleStrategy({
   clientID: CLIENT_ID,
   clientSecret: CLIENT_SECRET,
