@@ -2,9 +2,12 @@ name: Build and Deploy Services
 
 on:
   push:
+    paths:
+      - 'server/**'
+      - 'stay_on_track/**'
     branches:
       - main  # rulează la push pe main
-
+     
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
