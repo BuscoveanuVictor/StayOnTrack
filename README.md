@@ -28,7 +28,7 @@ Aplicația urmează modelul **client-server**:
 
 Următoarea diagramă prezintă principalele fluxuri ale aplicației StayOnTrack: adăugarea unui domeniu în block-list, editarea listei, accesarea unui domeniu blocat în browser și redirecționarea aplicațiilor mobile către StayOnTrack.
 
-![Diagrama interacțiunilor StayOnTrack](./home/victor/Downloads/uml2.png)
+![Diagrama interacțiunilor StayOnTrack](./assets/uml_diagram.png)
 
 ## 🔧 Instalare și rulare (local)
 
