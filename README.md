@@ -22,6 +22,56 @@ Aplicația urmează modelul **client-server**:
 
 ---
 
+---
+
+## 📊 Diagrama interacțiunilor
+
+Următoarea diagramă prezintă principalele fluxuri ale aplicației StayOnTrack: adăugarea unui domeniu în block-list, editarea listei, accesarea unui domeniu blocat în browser și redirecționarea aplicațiilor mobile către StayOnTrack.
+
+```plantuml
+@startuml
+actor User
+participant "Browser Extension" as Ext
+participant "chrome.storage.sync" as LS
+participant "Server" as API
+participant "Database" as DB
+participant "Mobile OS" as Mobile
+
+== Adăugare domeniu ==
+User --> Ext: Click add domain to block-list 
+Ext --> LS: setItem(currentTabDomain)
+Ext --> API: fetch(currentTabDomain)
+API --> DB: saveDomain(user, currentTabDomain)
+
+== Edit block-list ==
+User --> Ext: Click edit block-list
+Ext --> Browser: Redirect to StayOnTrack.site/block-list
+
+== Accesare domeniu ==
+User --> Browser: Access saved domain
+Browser --> Ext: onBeforeRequest(domain)
+Ext --> LS: getItem(domain)
+
+alt Tasks pending in LS
+    Ext --> User: StayOnTrack.site/task-list
+else No tasks
+    Ext --> Browser: allow navigation
+end
+
+== Mobile app redirection ==
+User --> Mobile: Open app with blocked domain (e.g., YouTube)
+Mobile --> Ext: Check if domain is blocked
+Ext --> LS: getItem(domain)
+alt Domain is blocked
+    Ext --> Mobile: Close app
+    Ext --> Mobile: Open StayOnTrack app
+else Domain not blocked
+    Ext --> Mobile: Allow app to open
+end
+
+@enduml
+
+
 ## 🔧 Instalare și rulare (local)
 
 ### Cerințe
@@ -105,7 +155,7 @@ Exemplu de document în `users`:
 ---
 
 ## 🧪 Testare
-Suite de teste unitare și de integrare – în curs de implementare.  
+Teste unitare și de integrare – în curs de implementare.  
 
 ---
 
