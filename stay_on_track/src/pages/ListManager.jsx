@@ -1,11 +1,17 @@
-import { useState, useEffect } from "react";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const WEB_URL = process.env.REACT_WEB_URL || "http://localhost:3000"
 
-const API_URL = process.env.REACT_APP_API_URL;
 
-function useListManager({ page }) {
-    const [list, setList] = useState([]);
+function useListManager({ list, setList, page }) {
 
+    async function isAuth() {
+        const result = await fetch(`${API_URL}/auth/check`).then(res => res.json())
+        return Promise.resolve(result.auth)
+    }
+  
     async function apiFetch(url, method = "GET", data = null) {
+        if(await isAuth())return;
+
         const options = {
             method,
             credentials: "include",
@@ -32,30 +38,50 @@ function useListManager({ page }) {
             // Aici exista PROBLEME DE RETEA
         } catch (error) {
             console.error("Fetch error: ",error);
-            return undefined;
+            return null;
         }
     }
 
-    async function loadList() {
-        const result = await apiFetch(`${API_URL}/${page}/${page}.json`)
-        return result;
+    async function loadRemoteList() {
+        let result = []
+        result = await apiFetch(`${API_URL}/${page}/${page}.json`)
+    
+        if(result)setList([...list, ...result.list]);
     }
 
-    //  const updateExtension = (newList) => {
-    //     window.postMessage({ type: messageType, list: newList }, 'http://localhost:3000');
-    // };
+    function loadLocalList(){
+        window.addEventListener('load',()=>{
+            window.postMessage({ type: `get-${page}-data` }, WEB_URL);
+        })
 
-    // const updateLocal = (newList) => {
-    //     setList(newList);
-    //     updateExtension(newList);
-    // };
+        window.addEventListener('message', (event) => {
+            if(event.data.type === `${page}-data`){
+                setList([...list,...event.data.list]);
+            }
+        })
+    }
+
+    function loadList(){
+        loadLocalList();
+        loadRemoteList();
+    }
+
+    function updateLocalList(newList){
+        window.postMessage({ type: `update-${page}-data`, list: newList }, WEB_URL);
+    }
+
+    function updateRemoteList(newList){
+        apiFetch(`${API_URL}/${page}/update`,'POST',{list : newList})
+    }
+
+    function updateList(newList){
+        setList(newList);
+        updateLocalList(newList);
+        updateRemoteList(newList);
+    }
 
 
-//   useEffect(() => {
-//     loadList();
-//   }, []);
-
-  return { loadList };
+    return { loadList, updateList };
 }
 
 export default useListManager;

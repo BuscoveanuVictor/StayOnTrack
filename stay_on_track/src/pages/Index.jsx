@@ -2,25 +2,25 @@ import React, { useEffect, useState } from "react";
 
 function Index() {
 
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(undefined);
 
   useEffect(() => {
-    // Verifică dacă utilizatorul este autentificat
-    fetch("/auth/check", {
-      method: "GET",
-      credentials: "include", // Asigură-te că trimiți cookie-urile de sesiune
-      headers:{
-              'Content-Type': 'application/json'
-          },
-    })
-    .then(res => res.json())
-    .then((data) => {
-      setIsAuth(data.authentificated);
-    })
-    .catch((error) => {
-      console.error("Eroare la verificarea autentificării:", error);
-    });
-  })
+    if(isAuth == undefined)
+      fetch("/auth/check", {
+        method: "GET",
+        credentials: "include", // Asigură-te că trimiți cookie-urile de sesiune
+        headers:{
+                'Content-Type': 'application/json'
+            },
+      })
+      .then(res => res.json())
+      .then((data) => {
+        setIsAuth(data.auth);
+      })
+      .catch((error) => {
+        console.error("Eroare la verificarea autentificarii:", error);
+      });
+  },[])
 
 
   const buttons = [

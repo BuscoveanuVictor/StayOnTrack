@@ -3,7 +3,8 @@ import styles from './BlockList.module.css';
 import Modal from './Modal';
 import useListManager from './ListManager';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const WEB_URL = process.env.REACT_WEB_URL || "http://localhost:3000"
 
 export default function BlockList() {
     
@@ -12,35 +13,13 @@ export default function BlockList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [blockedDomain, setBlockedDomain] = useState('');
     
-    const { loadList : loadList} = useListManager({page : "block-list"});
+    const { loadList , updateList } = useListManager({
+        list : blockList, 
+        setList : setBlockList,
+        page : "block-list"
+    });
 
-    // const { list: blockList, updateList: updateBlockList } = useListManager({
-    //     fetchUrl: "/block-list/blocked-sites.json",
-    //     updateUrl: "http://localhost:5000/block-list/update",
-    //     localStorageKey: "blockList",
-    //     messageType: "UPDATE_BLOCK_LIST"
-    // });
-
-    const updateLocalBlockList = (list) => {
-        // !!! Atentie setBlockList este asincron
-        // adica blockList se actualizeaza dupa ce
-        // functia componenta se termian
-        setBlockList(list);
-        updateExtensionBlockList(list);
-    }
-
-    const updateExtensionBlockList = (data) => {
-        window.postMessage({ type: 'UPDATE_BLOCK_LIST', blockList: data }, API_URL);
-    }
-
-    const loadBlockList = () => {
-        loadList().then((res)=>{
-            console.log(res.block_list)
-            updateLocalBlockList(res.block_list);
-        })
-    }
-  
-    const addToBlockList = (domain) => {
+    async function addToBlockList (domain) {
         if (!domain) {
             alert('Te rog introdu un domeniu!');
             return;
@@ -50,47 +29,15 @@ export default function BlockList() {
             alert('Acest domeniu este deja in lista!');
             return;
         }
-
-        updateLocalBlockList([...blockList, domain]);
-
-        // remote
-        fetch(`${API_URL}/block-list/add-domain`,{
-            method: 'POST',
-            credentials: 'include', // IMPORTANT pentru a trimite cookie-urile de sesiune 
-                                    // pentru a putea accesa sesiunea utilizatorului
-            headers:{
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                domain: domain
-            })
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(err => console.error('Eroare:', err));
+        updateList([...blockList, domain]);
     }
 
     const removeDomain = (domain)=> { 
-        updateLocalBlockList(blockList.filter(site => site !== domain));
-        fetch(`${API_URL}/block-list/remove/${domain}`,{
-            method: 'DELETE',
-            credentials: 'include', 
-            headers:{
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.status)
-        .then((status) => {
-            if(status === 200 ){
-                console.log("Site-ul a fost sters cu succes:", domain);
-            }
-        })
-        .catch(err => console.error('Eroare:', err));       
+        updateList(blockList.filter(site => site !== domain));     
     }
 
     useEffect(()=> {
-        // Incarca site-urile blocate la pornirea paginii
-        loadBlockList();
+        loadList();  
     },[]);
     
 

@@ -16,66 +16,17 @@ export default function TaskTracker() {
   const [editId, setEditId] = useState(null);
 
 
-  const { loadList } = useListManager({page : "task-list"});
-
+  const { loadList , updateList } = useListManager({
+      list : taskList, 
+      setList : setTaskList,
+      page : "task-list"
+  });
 
   useEffect(() => {
-    loadTasks();
+     loadList();
   }, []);
 
-  const updateTaskList = (list) => {
-    localUpdateTaskList(list);
-    remoteUpdateTaskList(list);
-  }
-
-  const updateExtensionTaskList = (list) => {
-      window.postMessage({ type: 'UPDATE_TASK_LIST', taskList: list }, 'http://localhost:3000');
-  }
-
-  const updateLocalStorageTaskList = (list) => {
-    setTaskList(list);
-    localStorage.setItem("taskList", JSON.stringify(list));
-  }
-
-  const localUpdateTaskList = (list) => {
-    // !!! Atentie setBlockList este asincron
-    // adica blockList se actualizeaza dupa ce
-    // functia componenta se termian
-    setTaskList(list);
-    updateLocalStorageTaskList(list);
-    updateExtensionTaskList(list);
-  }
-
-  const remoteUpdateTaskList = (list) => {
-    // se da update si la lista locala 
-    fetch(`${API_URL}/task-list/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        task_list: list,
-      }),
-    })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Task list updated successfully:", data.message);
-    })
-    .catch((error) => {
-      console.error("Eroare la actualizarea task-urilor pe server:", error);
-    });
-
-  };
-
-
-  const loadTasks = () => {
-    loadList().then(res => {
-      localUpdateTaskList(res.task_list);
-    })
-  };
-
-  const addTask = () => {
+  function addTask () {
     if (!formData.title) {
       alert("Te rog introdu un titlu pentru task!");
       return;
@@ -93,16 +44,19 @@ export default function TaskTracker() {
       completed: false
     };
 
-    updateTaskList([...taskList, newTask]);
+    updateList([...taskList, newTask]);
     resetForm();
   };
 
-  const deleteTask = (id) => {
+  function deleteTask (id) {
     if (window.confirm("Esti sigur ca vrei sa stergi acest task?")) {
-        updateTaskList(taskList.filter((t) => t.id !== id));
+        updateList(taskList.filter((t) => t.id !== id));
     }
   };
 
+  // aici doar editez formularul
+  // dupa care la updateTask
+  // il schimb si 'fizic'
   const editTask = (id) => {
     const task = taskList.find((t) => t.id === id);
     if (task) {
@@ -118,13 +72,11 @@ export default function TaskTracker() {
   };
 
   const updateTask = () => {
-    updateTaskList(taskList.map((t) => 
+    updateList(taskList.map((t) => 
       t.id === editId ? { ...t, ...formData } : t
     ));
     resetForm();
   };
-
-
 
   const toggleTaskForm = () => {
     setShowForm((prev) => !prev);
@@ -145,7 +97,7 @@ export default function TaskTracker() {
 
   
   const toggleComplete = (id) => {
-    updateTaskList(taskList.map((t) =>
+    updateList(taskList.map((t) =>
       t.id === id ? { ...t, completed: !t.completed } : t
     ));
   };

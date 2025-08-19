@@ -149,58 +149,43 @@ app.get('/auth/google/callback',
 )
 
 app.get('/auth/check', (req, res) => {
-  //console.log(req.isAuthenticated())
-  res.json({
-    authentificated: req.isAuthenticated()
-  });
+    res.json({
+      auth: req.isAuthenticated()
+    });
 });
 
 app.get('/block-list/block-list.json', async (req, res) => {
-  const user = await db.collection('users').findOne({ _id: req.user._id });
-  res.json({block_list: user.block_list || []});
+    const user = await db.collection('users').findOne({ _id: req.user._id });
+    res.json({list: user.block_list || []});
 });
 
-app.post('/block-list/add-domain', async (req, res) => {
+app.post('/block-list/update', async (req, res) => {
 
-    console.log("User is authenticated:", req.user);
-    const { domain } = req.body; // extrage domain din body
-
-    console.log("Received request to add domain:", domain);
+    const { list } = req.body; 
     await db.collection('users').updateOne(
         { _id : req.user._id }, // folosim _id-ul userului autentificat
         { 
-          $push: { "block_list": domain } 
+          $set: { "block_list": list } 
         }
     );
-    res.json({ message: "Domain added successfully" });
+    res.json({ message: "List updated successfully" });
 
 });
 
-app.delete('/block-list/remove/:domain', async (req, res) => {
-  const domain = req.params.domain;
-  console.log("Received request to remove domain:", domain);
-  await db.collection('users').updateOne(
-      { _id : req.user._id }, // folosim _id-ul userului autentificat
-      {
-        $pull: { "block_list" : domain }
-      }
-  );
-  res.status(200).send(); // trimite un raspuns de succes
-});
 
 app.get('/task-list/task-list.json', async (req, res) => {
   const user = await db.collection('users').findOne({ _id: req.user._id });
-    res.json({task_list : user.task_list || []}
+    res.json({list : user.task_list || []}
   );
 })
 
 app.post('/task-list/update', async (req, res) => {
-    const { task_list } = req.body; // extrage task din body
-    console.log("Received request to update task_list:", task_list);
+    const { list } = req.body; // extrage task din body
+    console.log("Received request to update task_list:", list);
     await db.collection('users').updateOne(
         { _id : req.user._id }, // folosim _id-ul userului autentificat
         { 
-          $set: { "task_list": task_list } 
+          $set: { "task_list": list } 
         }
     );
     res.json({ message: "Task list updated successfully" });

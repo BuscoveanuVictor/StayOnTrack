@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stayontrack-web
+  namespace: stayontrack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stayontrack-web
+  template:
+    metadata:
+      labels:
+        app: stayontrack-web
+    spec:
+      containers:
+        - name: web
+          image: buscoveanuvictor/stay_on_track_web:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: REACT_APP_API_URL
+              value: http://stayontrack.site:5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stayontrack-web
+  namespace: stayontrack
+spec:
+  selector:
+    app: stayontrack-web
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort  
