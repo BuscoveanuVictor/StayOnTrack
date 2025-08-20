@@ -12,10 +12,16 @@ const app = express();
 
 // ****** VARIABILE DE ENV ******
 
-require('dotenv').config();
+// NODE ENV se seteaza in package.json 
+// la sectiunea scripts
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`
+});
 
 const CLIENT_ID = process.env.CLIENT_ID; 
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
+
+//
 const DB_SERVER_URL = process.env.DB_SERVER_URL; 
 const WEB_SERVER_URL = process.env.WEB_SERVER_URL;
 const API_SERVER_URL = process.env.API_SERVER_URL;
@@ -169,8 +175,21 @@ app.post('/block-list/update', async (req, res) => {
         }
     );
     res.json({ message: "List updated successfully" });
+});
+
+app.post('/block-list/add-domain', async (req, res) => {
+
+    const { domain } = req.body; 
+    await db.collection('users').updateOne(
+        { _id : req.user._id }, // folosim _id-ul userului autentificat
+        { 
+          $push: { "block_list": domain } 
+        }
+    );
+    res.json({ message: "List updated successfully" });
 
 });
+
 
 
 app.get('/task-list/task-list.json', async (req, res) => {

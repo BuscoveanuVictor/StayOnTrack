@@ -1,4 +1,13 @@
+// Cand se afieseaza pagina externsiei 
+// de blocare a site-urilor
+window.addEventListener('load',()=>{
+    chrome.storage.local.get(['currentSite'],(data)=>{
+        document.getElementById('domain').textContent = data.currentSite;
+    })
+})
+
 function remoteSave(hostname){
+    console.log("salut")
     fetch('http://localhost:5000/block-list/add-domain', {
         method: 'POST',
         credentials : "include",
@@ -18,21 +27,20 @@ function remoteSave(hostname){
     });
 }
 
-function localSave(list){
-    chrome.storage.sync.set({ blockList : list}, () => {
+const WEB_URL = "http://localhost:3000";
+function localSave(blockList){
+    chrome.storage.sync.set({ blockList : blockList}, () => {
         console.log("Domain salvat în sync storage!");
     });
 }
 
 document.getElementById('blockBtn').addEventListener('click', async() => {
-    const domainElement = document.getElementById('domain');
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     try {
         const url = new URL(tab.url);
         const hostname = url.hostname;
-        domainElement.textContent = hostname;
-
+     
         chrome.storage.sync.get(['blockList'] , function(result) {
             const blockList = result.blockList || [];
             console.log(blockList)
@@ -44,6 +52,6 @@ document.getElementById('blockBtn').addEventListener('click', async() => {
         });
 
     } catch (e) {
-        domainElement.textContent = 'Invalid URL';
+        alert("Url invalid");
     }
 });

@@ -12,23 +12,9 @@ window.addEventListener('message', (event) => {
         });
     }
 
-    if(event.data.type === 'get-block-list-data'){
-        chrome.storage.sync.get(['blockList'], (data) => {
-            console.log("Sent sync storage data...")
-            window.postMessage({ type: 'block-list-data', list: data.blockList || [] }, WEB_URL);
-        });
-    }
-
     if (event.data.type === 'update-task-list-data'){
         chrome.storage.sync.set({ taskList : event.data.list }, () => {
             console.log("Sync storage updated!");
-        });
-    }
-
-    if(event.data.type === 'get-task-list-data'){
-        chrome.storage.sync.get(['taskList'], (data) => {
-            console.log("Sent sync storage data...")
-            window.postMessage({ type: 'task-list-data', list: data.taskList || [] }, WEB_URL);
         });
     }
 

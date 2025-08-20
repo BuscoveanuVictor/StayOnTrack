@@ -42,34 +42,23 @@ function useListManager({ list, setList, page }) {
         }
     }
 
-    async function loadRemoteList() {
+    async function loadList() {
         let result = []
+        // cer datele de la server
         result = await apiFetch(`${API_URL}/${page}/${page}.json`)
-    
-        if(result)setList([...list, ...result.list]);
+        
+        // setez pe client
+        setList(result.list);
+        // si pe local sync
+        updateLocalList(result.list);  
     }
 
-    function loadLocalList(){
-        window.addEventListener('load',()=>{
-            window.postMessage({ type: `get-${page}-data` }, WEB_URL);
-        })
-
-        window.addEventListener('message', (event) => {
-            if(event.data.type === `${page}-data`){
-                setList([...list,...event.data.list]);
-            }
-        })
-    }
-
-    function loadList(){
-        loadLocalList();
-        loadRemoteList();
-    }
-
+    // setItem din diagrama UML
     function updateLocalList(newList){
         window.postMessage({ type: `update-${page}-data`, list: newList }, WEB_URL);
     }
 
+    // fetch din diagrama UML
     function updateRemoteList(newList){
         apiFetch(`${API_URL}/${page}/update`,'POST',{list : newList})
     }
@@ -79,7 +68,6 @@ function useListManager({ list, setList, page }) {
         updateLocalList(newList);
         updateRemoteList(newList);
     }
-
 
     return { loadList, updateList };
 }

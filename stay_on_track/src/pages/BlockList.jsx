@@ -37,7 +37,13 @@ export default function BlockList() {
     }
 
     useEffect(()=> {
-        loadList();  
+        // atentie mare aici
+        // in functiile din loadList exista setList care modifica list si
+        // re randeaza pagina prin urmare daca tu nu punea linia de mai jos
+        // in useEffect care se realiazeaza o singura data datorita arg []
+        // de fiecare data cand se apela setList se randa pagina si
+        // iar se apela functia din window.onload( bucla infinita )
+        window.onload = loadList;
     },[]);
     
 

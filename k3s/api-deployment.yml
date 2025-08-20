@@ -39,11 +39,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: stayontrack-api
+  name: api
   namespace: stayontrack
 spec:
   selector:
-    app: stayontrack-api
+    app: api
   ports:
     - port: 5000
       targetPort: 5000
