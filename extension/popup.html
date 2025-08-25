@@ -4,16 +4,104 @@
   <meta charset="UTF-8">
   <title>Focus</title>
   <link rel="stylesheet" href="popup.css">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #23263a 0%, #35384d 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      min-width: 340px;
+      min-height: 480px;
+    }
+    .container {
+      width: 360px;
+      min-height: 480px;
+      background: rgba(36, 39, 61, 0.98);
+      box-shadow: 0 8px 32px rgba(16, 24, 40, 0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: hidden;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+      min-height: 340px;
+      background: transparent;
+    }
+    #iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      background: transparent;
+    }
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #23263a;
+      padding: 0 0 0 0;
+      border-top: 1.5px solid #35384d;
+      min-height: 72px;
+      box-shadow: 0 -2px 12px #23263a22;
+    }
+    .bottom-nav button {
+      flex: 1;
+      margin: 0;
+      padding: 14px 0 10px 0;
+      background: none;
+      border: none;
+      color: #a5b4fc;
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.08s;
+      border-radius: 0;
+      outline: none;
+      border-right: 1.5px solid #35384d;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+    .bottom-nav button:last-child {
+      border-right: none;
+    }
+    .bottom-nav button:hover, .bottom-nav button.active {
+      background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%);
+      color: #fff;
+      transform: scale(1.04);
+    }
+    @media (max-width: 400px) {
+      .container {
+        width: 98vw;
+        min-width: unset;
+      }
+      .main-content {
+        min-height: 220px;
+      }
+      .bottom-nav button {
+        font-size: 0.98rem;
+        padding: 10px 0 8px 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <div class="main-content" id="contentArea">
-        <iframe src="templates/block_sites.html" width="100%" height="100%" frameborder="0" id="iframe"></iframe>
+        <iframe src="templates/blockSites.html" width="100%" height="100%" frameborder="0" id="iframe"></iframe>
     </div>
     <div class="bottom-nav">
+      <button id="btnBreak">Break<br>Time</button>
       <button id="btnBlock">Block<br>Site</button>
-      <button id="btnFocus">Focus<br>Mode</button>
-      <button id="btnTasks">Tasks</button>
+      <button id="btnTasks">Task<br>Tracker</button>
     </div>
   </div>
   <script src="popup.js"></script>

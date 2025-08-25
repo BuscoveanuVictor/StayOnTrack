@@ -133,13 +133,10 @@ passport.deserializeUser(async (id, done) => {
 
 
 // ****** RUTE ******
-app.get('/', (req, res) => { 
-  res.redirect(WEB_SERVER_URL);
-})
 
 // Auth cu google
 app.get('/auth/google',  
-  // aici se incarca pagina de autentificare cu Google(aleger cont)
+  // aici se incarca pagina de autentificare cu Google(alegere cont)
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
@@ -150,9 +147,19 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     console.log("User authenticated:", req.user);
-    res.redirect('/');
+    res.redirect(`${WEB_SERVER_URL}/`);
   }
-)
+);
+
+app.get('/auth/google/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.redirect(WEB_SERVER_URL); 
+    });
+  });
+});
 
 app.get('/auth/check', (req, res) => {
     res.json({
@@ -160,7 +167,7 @@ app.get('/auth/check', (req, res) => {
     });
 });
 
-app.get('/block-list/block-list.json', async (req, res) => {
+app.get('/block-list.json', async (req, res) => {
     const user = await db.collection('users').findOne({ _id: req.user._id });
     res.json({list: user.block_list || []});
 });
@@ -187,12 +194,40 @@ app.post('/block-list/add-domain', async (req, res) => {
         }
     );
     res.json({ message: "List updated successfully" });
-
 });
 
 
+app.get('/allow-list.json', async (req, res) => {
+    const user = await db.collection('users').findOne({ _id: req.user._id });
+    res.json({list: user.allow_list || []});
+});
 
-app.get('/task-list/task-list.json', async (req, res) => {
+app.post('/allow-list/add-domain', async (req, res) => {
+
+    const { domain } = req.body; 
+    await db.collection('users').updateOne(
+        { _id : req.user._id }, // folosim _id-ul userului autentificat
+        { 
+          $push: { "allow_list": domain } 
+        }
+    );
+    res.json({ message: "List updated successfully" });
+});
+
+app.post('/allow-list/update', async (req, res) => {
+
+    const { list } = req.body; 
+    await db.collection('users').updateOne(
+        { _id : req.user._id }, // folosim _id-ul userului autentificat
+        { 
+          $set: { "allow_list": list } 
+        }
+    );
+    res.json({ message: "List updated successfully" });
+});
+
+
+app.get('/task-list.json', async (req, res) => {
   const user = await db.collection('users').findOne({ _id: req.user._id });
     res.json({list : user.task_list || []}
   );

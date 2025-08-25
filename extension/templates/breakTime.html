@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Break Time</title>
+  <style>
+    body {
+      overflow: hidden;
+      background: #2d3142;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+    }
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .timer-svg {
+      display: block;
+      margin: 0 auto;
+    }
+    .timer-text {
+      font-size: 2.8rem;
+      fill: #e5e7fa;
+      font-family: inherit;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .break-btn {
+      margin-top: 32px;
+      padding: 14px 40px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      box-shadow: 0 4px 16px rgba(99,102,241,0.15);
+      cursor: pointer;
+      outline: none;
+      letter-spacing: 1px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .break-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .break-btn:hover:enabled {
+      background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="timer-container">
+    <svg id="timerSvg" class="timer-svg" width="240" height="240">
+      <circle
+        id="timerBg"
+        cx="120"
+        cy="120"
+        r="108"
+        stroke="#393e4f"
+        stroke-width="8"
+        fill="none"
+      />
+      <circle
+        id="timerProgress"
+        cx="120"
+        cy="120"
+        r="108"
+        stroke="#a5b4fc"
+        stroke-width="8"
+        fill="none"
+        stroke-linecap="round"
+        stroke-dasharray="678.58"
+        stroke-dashoffset="678.58"
+        style="transition: stroke-dashoffset 0.5s linear;"
+      />
+      <text
+        id="timerText"
+        x="120"
+        y="120"
+        class="timer-text"
+      >5:00</text>
+    </svg>
+    <button class="break-btn" id="breakBtn">Start Break</button>
+  </div>
+  <script src="/js/breakTime.js"></script>
+</body>
+</html>

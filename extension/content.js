@@ -18,4 +18,16 @@ window.addEventListener('message', (event) => {
         });
     }
 
+    if (event.data.type === 'update-allow-list-data'){
+        chrome.storage.sync.set({ allowList : event.data.list }, () => {
+            console.log("Sync storage updated!");
+        });
+    }
+
+    if (event.data.type === 'SET_MODE'){
+        chrome.storage.sync.set({ mode : event.data.mode }, () => {
+            console.log("Sync storage updated!");
+        });
+    }
+
 });

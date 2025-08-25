@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-function Index() {
+export default function Dashboard() {
 
   const [isAuth, setIsAuth] = useState(undefined);
 
@@ -27,7 +27,7 @@ function Index() {
 
   const buttons = [
     { href: "habits", label: "Habits" },
-    { href: "tasks", label: "Tasks" },
+    { href: "task-list", label: "Tasks" },
     { href: "block-list", label: "Block list" },
     { href: "auth", label: "Authentificate"}
   ]
@@ -115,4 +115,3 @@ function Index() {
   );
 }
 
-export default Index;

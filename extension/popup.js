@@ -36,14 +36,14 @@ window.addEventListener('message', (event) => {
 document.addEventListener('DOMContentLoaded', () => {
 
     btnBlock.addEventListener('click', () => {
-        iframe.src = "templates/block_sites.html";
+        iframe.src = "templates/blockSites.html";
     });
 
-    btnFocus.addEventListener('click', () => {
-        iframe.src = "templates/focus_mode.html";
+    btnBreak.addEventListener('click', () => {
+        iframe.src = "templates/breakTime.html";
     });
 
     btnTasks.addEventListener('click', () => {
-        iframe.src = "templates/tasks.html";
+        iframe.src = "templates/taskTracker.html";
     });
 });
