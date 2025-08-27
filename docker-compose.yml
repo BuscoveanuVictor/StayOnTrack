@@ -13,9 +13,9 @@ services:
     # var de aici le suprascriu pe cele din env_file
     environment:
       - DB_SERVER_URL=mongodb://db:27017/StayOnTrack
-      - WEB_SERVER_URL=http://localhost
+      - WEB_SERVER_URL=http://localhost:80
     env_file:
-    - ./server/.env
+    - ./server/.env.production
 
   db:
     image: mongo:latest

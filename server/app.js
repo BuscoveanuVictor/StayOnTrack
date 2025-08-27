@@ -6,6 +6,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')
+const crypto = require('crypto');
 
 // ****** APLICATIE EXPRESS ******
 const app = express();
@@ -167,12 +168,120 @@ app.get('/auth/check', (req, res) => {
     });
 });
 
+// Helperi parola/rules
+function hashPassword(raw) {
+  return require('crypto').createHash('sha256').update(String(raw)).digest('hex');
+}
+
+const PASSWORD_WINDOW_MS = 5 * 60 * 1000; // 5 minute
+
+async function ensurePasswordValidated(req, res, next) {
+  try {
+    const user = await db.collection('users').findOne({ _id: req.user._id });
+    const rules = user && user.rules ? user.rules : {};
+    if (rules.passwordEnabled) {
+      const validated = req.session && req.session.passwordValidated;
+      const validatedAt = req.session && req.session.passwordValidatedAt;
+      const stillValid = validated && typeof validatedAt === 'number' && (Date.now() - validatedAt) <= PASSWORD_WINDOW_MS;
+      if (!stillValid) {
+        if (req.session) {
+          req.session.passwordValidated = false;
+          req.session.passwordValidatedAt = null;
+        }
+        return res.status(403).json({ message: 'Parola necesara', needsPassword: true });
+      }
+    }
+    next();
+  } catch (e) {
+    return res.status(500).json({ message: 'Eroare server' });
+  }
+}
+
+app.get('/rules', async (req, res) => {
+  try {
+    const user = await db.collection('users').findOne({ _id: req.user._id }, { projection: { rules: 1 } });
+    const rules = user && user.rules ? user.rules : {};
+    res.json({
+      breakEnabled: !!rules.breakEnabled,
+      breakCount: rules.breakCount || 1,
+      breakTime: rules.breakTime || 5,
+      passwordEnabled: !!rules.passwordEnabled,
+      passwordValidated: !!(req.session && req.session.passwordValidated)
+    });
+  } catch (e) {
+    res.status(500).json({ message: 'Eroare server' });
+  }
+});
+
+app.post('/rules', async (req, res) => {
+  try {
+    const { breakEnabled, breakCount, breakTime, passwordEnabled, password } = req.body || {};
+
+    const toSet = {
+      'rules.breakEnabled': !!breakEnabled,
+      'rules.breakCount': Number(breakCount) || 1,
+      'rules.breakTime': Number(breakTime) || 5,
+      'rules.passwordEnabled': !!passwordEnabled,
+    };
+
+    if (passwordEnabled && password) {
+      toSet['rules.passwordHash'] = hashPassword(password);
+      if (req.session) req.session.passwordValidated = false;
+    }
+
+    if (!passwordEnabled) {
+      toSet['rules.passwordHash'] = null;
+      if (req.session) req.session.passwordValidated = false;
+    }
+
+    await db.collection('users').updateOne(
+      { _id: req.user._id },
+      { $set: toSet }
+    );
+    res.json({ message: 'Rules updated successfully' });
+  } catch (e) {
+    res.status(500).json({ message: 'Eroare server' });
+  }
+});
+
+app.post('/auth/validate-password', async (req, res) => {
+  try {
+    const { password } = req.body || {};
+    if (!password) return res.status(400).json({ message: 'Parola lipsa' });
+
+    const user = await db.collection('users').findOne({ _id: req.user._id });
+    const rules = user && user.rules ? user.rules : {};
+    if (!rules.passwordEnabled || !rules.passwordHash) {
+      return res.status(400).json({ message: 'Parola nu este activata' });
+    }
+
+    const isOk = hashPassword(password) === rules.passwordHash;
+    if (!isOk) return res.status(401).json({ message: 'Parola incorecta' });
+
+    req.session.passwordValidated = true;
+    req.session.passwordValidatedAt = Date.now();
+    res.json({ message: 'Parola valida', passwordValidated: true, validForMs: PASSWORD_WINDOW_MS });
+  } catch (e) {
+    res.status(500).json({ message: 'Eroare server' });
+  }
+});
+
+app.get('/auth/password-status', (req, res) => {
+  const validated = !!(req.session && req.session.passwordValidated);
+  const validatedAt = req.session && req.session.passwordValidatedAt;
+  let remainingMs = 0;
+  if (validated && typeof validatedAt === 'number') {
+    remainingMs = Math.max(0, PASSWORD_WINDOW_MS - (Date.now() - validatedAt));
+  }
+  res.json({ passwordValidated: validated && remainingMs > 0, remainingMs });
+});
+
 app.get('/block-list.json', async (req, res) => {
     const user = await db.collection('users').findOne({ _id: req.user._id });
     res.json({list: user.block_list || []});
 });
 
-app.post('/block-list/update', async (req, res) => {
+app.post('/block-list/update', ensurePasswordValidated, async (req, res) => {
 
     const { list } = req.body; 
     await db.collection('users').updateOne(
@@ -184,7 +293,7 @@ app.post('/block-list/update', async (req, res) => {
     res.json({ message: "List updated successfully" });
 });
 
-app.post('/block-list/add-domain', async (req, res) => {
+app.post('/block-list/add-domain', ensurePasswordValidated, async (req, res) => {
 
     const { domain } = req.body; 
     await db.collection('users').updateOne(
@@ -202,7 +311,7 @@ app.get('/allow-list.json', async (req, res) => {
     res.json({list: user.allow_list || []});
 });
 
-app.post('/allow-list/add-domain', async (req, res) => {
+app.post('/allow-list/add-domain', ensurePasswordValidated, async (req, res) => {
 
     const { domain } = req.body; 
     await db.collection('users').updateOne(
@@ -214,7 +323,7 @@ app.post('/allow-list/add-domain', async (req, res) => {
     res.json({ message: "List updated successfully" });
 });
 
-app.post('/allow-list/update', async (req, res) => {
+app.post('/allow-list/update', ensurePasswordValidated, async (req, res) => {
 
     const { list } = req.body; 
     await db.collection('users').updateOne(
@@ -243,6 +352,18 @@ app.post('/task-list/update', async (req, res) => {
         }
     );
     res.json({ message: "Task list updated successfully" });
+});
+
+
+app.post('/rules/update', async (req, res) => {
+    const { rules } = req.body;
+    await db.collection('users').updateOne(
+        { _id: req.user._id },
+        {
+            $set: { "rules": rules }
+        }
+    );
+    res.json({ message: "Rules updated successfully" });
 });
 
 app.listen(5000, () => {

@@ -25,8 +25,20 @@ if (chrome && chrome.storage && chrome.storage.sync) {
 } else {
     // fallback pentru test local
     renderTasks([
-    {completed: false, title: "Test task", dueDate: "2025-08-20"},
-    {completed: true, title: "Completed task", dueDate: "2025-08-19"}
+        {completed: false, title: "Test task", dueDate: "2025-08-20"},
+        {completed: true, title: "Completed task", dueDate: "2025-08-19"}
     ]);
 }
 });
+
+
+// Setează clasa pe body în funcție de mode-ul din chrome.storage.sync
+if (chrome && chrome.storage && chrome.storage.sync) {
+  chrome.storage.sync.get(['mode'], (data) => {
+    if (data.mode === "allow") {
+      document.body.classList.add('allow-mode');
+    } else {
+      document.body.classList.remove('allow-mode');
+    }
+  });
+}

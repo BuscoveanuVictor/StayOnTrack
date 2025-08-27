@@ -26,7 +26,6 @@ export default function Dashboard() {
 
 
   const buttons = [
-    { href: "habits", label: "Habits" },
     { href: "task-list", label: "Tasks" },
     { href: "block-list", label: "Block list" },
     { href: "auth", label: "Authentificate"}

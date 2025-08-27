@@ -7,10 +7,11 @@
   <style>
     body {
       margin: 0;
-      background: linear-gradient(135deg, #23263a 0%, #35384d 100%);
+      background: var(--main-bg, linear-gradient(135deg, #23263a 0%, #35384d 100%));
       font-family: 'Inter', Arial, sans-serif;
       min-width: 340px;
       min-height: 480px;
+      transition: background 0.3s;
     }
     .container {
       width: 360px;
@@ -21,6 +22,7 @@
       flex-direction: column;
       align-items: stretch;
       overflow: hidden;
+      transition: background 0.3s;
     }
     .main-content {
       flex: 1;
@@ -42,11 +44,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #23263a;
+      background: var(--nav-bg, #23263a);
       padding: 0 0 0 0;
       border-top: 1.5px solid #35384d;
       min-height: 72px;
       box-shadow: 0 -2px 12px #23263a22;
+      transition: background 0.3s;
     }
     .bottom-nav button {
       flex: 1;
@@ -54,7 +57,7 @@
       padding: 14px 0 10px 0;
       background: none;
       border: none;
-      color: #a5b4fc;
+      color: var(--btn-color, #a5b4fc);
       font-size: 1.08rem;
       font-weight: 700;
       letter-spacing: 0.5px;
@@ -74,7 +77,7 @@
       border-right: none;
     }
     .bottom-nav button:hover, .bottom-nav button.active {
-      background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%);
+      background: var(--btn-hover, linear-gradient(90deg, #6366f1 0%, #a21caf 100%));
       color: #fff;
       transform: scale(1.04);
     }
@@ -100,7 +103,7 @@
     </div>
     <div class="bottom-nav">
       <button id="btnBreak">Break<br>Time</button>
-      <button id="btnBlock">Block<br>Site</button>
+      <button id="btnBlock"></button>
       <button id="btnTasks">Task<br>Tracker</button>
     </div>
   </div>

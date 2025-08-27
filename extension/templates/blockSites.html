@@ -3,119 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Blocked Sites</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #23263a 0%, #35384d 100%);
-      font-family: 'Inter', Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .container {
-      background: rgba(36, 39, 61, 0.98);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(16, 24, 40, 0.18);
-      padding: 40px 32px 32px 32px;
-      min-width: 320px;
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-    .icon {
-      width: 48px;
-      height: 48px;
-      background: #fff;
-      border-radius: 14px;
-      padding: 7px;
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 2px 12px #23263a33;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .domain-title {
-      margin-top: 36px;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #f1f5fa;
-      letter-spacing: 0.5px;
-      word-break: break-all;
-      text-align: center;
-      text-shadow: 0 2px 8px #23263a55;
-    }
-    .btn {
-      display: block;
-      width: 90%;
-      margin: 16px auto 0 auto;
-      padding: 14px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.08rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.18s, transform 0.08s;
-      box-shadow: 0 2px 12px #23263a22;
-      letter-spacing: 0.5px;
-    }
-    .btn.green {
-      background: linear-gradient(90deg, #34c38f 0%, #06b6d4 100%);
-      color: #fff;
-    }
-    .btn.green:hover {
-      background: linear-gradient(90deg, #22d3ee 0%, #34c38f 100%);
-      transform: scale(1.03);
-    }
-    .btn.grey {
-      background: #e0e0e0;
-      color: #333;
-    }
-    .btn.grey:hover {
-      background: #cbd5e1;
-      color: #23263a;
-      transform: scale(1.03);
-    }
-    #notification {
-      display: none;
-      margin-top: 20px;
-      font-size: 1rem;
-      border-radius: 8px;
-      padding: 12px;
-      min-width: 60%;
-      background: #34c38f;
-      color: #fff;
-      box-shadow: 0 2px 12px #23263a22;
-      transition: opacity 0.3s;
-      opacity: 1;
-      text-align: center;
-    }
-    @media (max-width: 500px) {
-      .container {
-        min-width: unset;
-        max-width: 98vw;
-        padding: 24px 6vw 24px 6vw;
-      }
-      .domain-title {
-        font-size: 1rem;
-      }
-      .btn {
-        font-size: 1rem;
-        padding: 12px 0;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="static/style.css">
+  
 </head>
 <body>
   <div class="container">
     <div class="icon">
-      <!-- Exemplu favicon implicit, poți schimba cu favicon-ul site-ului curent dinamic cu JS -->
       <img id="favicon" src="https://www.google.com/s2/favicons?sz=64&domain=example.com" alt="favicon" style="width:34px;height:34px;border-radius:8px;">
     </div>
     <h2 class="domain-title" id="domain"></h2>
@@ -124,10 +17,6 @@
     <div id="notification"></div>
   </div>
   <script src="/js/blockSites.js"></script>
-  <script>
-  
-    const domain = document.getElementById('domain').textContent;
-    document.getElementById('favicon').src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-  </script>
+
 </body>
 </html>

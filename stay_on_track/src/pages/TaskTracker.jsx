@@ -19,7 +19,7 @@ export default function TaskTracker() {
   const { loadList , updateList } = useListManager({
       list : taskList, 
       setList : setTaskList,
-      page : "task-list"
+      label : "task-list"
   });
 
   useEffect(() => {
@@ -112,6 +112,12 @@ export default function TaskTracker() {
     setEditId(null);
     setShowForm(false);
   };
+
+  useEffect(() => {
+    document.body.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+    document.body.style.minHeight = "100vh";
+    document.body.style.margin = "0";
+  }, []);
 
   return (
     <div style={styles.container}>
@@ -278,7 +284,7 @@ const styles = {
   container: {
     maxWidth: "800px",
     margin: "0 auto",
-    background: "white",
+    background: "rgba(255,255,255,0.92)", // <-- transparent, vezi gradientul
     borderRadius: "15px",
     boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
     overflow: "hidden",

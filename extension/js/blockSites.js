@@ -2,6 +2,30 @@
 // de blocare a site-urilor sa vada userul
 // ce site vrea sa blocheze
 
+if (chrome && chrome.storage && chrome.storage.sync) {
+  chrome.storage.sync.get(['mode'], (data) => {
+    if (data.mode === "allow") {
+      document.body.classList.add('allow-mode');
+      document.getElementById('blockBtn').textContent = "Add to allow list";
+      document.title = "Allowed Sites";
+    } else {
+      document.body.classList.remove('allow-mode');
+      document.getElementById('blockBtn').textContent = "Add to block list";
+      document.title = "Blocked Sites";
+    }
+    // Setează și titlul de sus dacă vrei
+    const domainTitle = document.getElementById('domain');
+    if (domainTitle) {
+      const listType = data.mode === "allow" ? "Allow List" : "Block List";
+      domainTitle.textContent = `${listType}`;
+    }
+  });
+}
+document.getElementById('editBtn').addEventListener('click', async  () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    chrome.tabs.update(tab.id, { url: "http://localhost:3000/block-list"});
+});
+
 let currentSite;
 window.addEventListener('load',()=>{
     chrome.storage.local.get(['currentSite'],(data)=>{
@@ -60,14 +84,14 @@ document.getElementById('blockBtn').addEventListener('click', async() => {
             if(!blockList.includes(currentSite)){
                 remoteSave(currentSite);
                 localSave([...blockList, currentSite])
-                showNotification("Domeniul a fost adăugat cu succes la lista de blocare.");
+                showNotification("Domain has been added to the block list.");
             } else {
-                showNotification('Acest domeniu este deja in lista!', "#dc3545");
+                showNotification('This domain is already in the list!', "#dc3545");
             }
         });
 
     } catch (e) {
-        showNotification("Nu poti adauga acest domain", "#dc3545"); // roșu pentru eroare
+        showNotification("You cannot add this domain", "#dc3545"); // roșu pentru eroare
     }
 });
 

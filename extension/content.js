@@ -25,9 +25,9 @@ window.addEventListener('message', (event) => {
     }
 
     if (event.data.type === 'SET_MODE'){
+        console.log("SET_MODE received in content.js:", event.data.mode);
         chrome.storage.sync.set({ mode : event.data.mode }, () => {
             console.log("Sync storage updated!");
         });
     }
-
 });
