@@ -5,6 +5,7 @@ on:
     paths:
       - 'server/**'
       - 'stay_on_track/**'
+      - 'k3s/**'
     branches:
       - main  # rulează la push pe main
      
@@ -48,9 +49,27 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             export CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} 
-            export CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} 
+            export CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
-            docker pull $IMAGE_WEB:latest
-            docker pull $IMAGE_API:latest
-            docker-compose -f docker-compose.staging.yml down
-            docker-compose -f docker-compose.staging.yml up -d
+            cd 
+
+            rm -rf StayOnTrack/
+
+            git clone --no-checkout https://github.com/BuscoveanuVictor/StayOnTrack.git
+            cd StayOnTrack
+            git sparse-checkout init --cone
+            git sparse-checkout set k3s
+            git checkout main 
+
+            cd StayOnTrack/k3s
+
+            kubectl apply -f namespace.yml
+            envsubst < google-secrets.yml | kubectl apply -f -
+            kubectl apply -f mongo-pvc.yml
+            kubectl apply -f db-deployment.yml
+            kubectl apply -f api-deployment.yml
+            kubectl apply -f web-deployment.yml
+            kubectl apply -f web-ingress.yml
+
+            kubectl rollout restart deployment/stayontrack-web -n stayontrack
+            kubectl rollout restart deployment/stayontrack-api -n stayontrack

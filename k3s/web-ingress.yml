@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stayontrack-web-ingress
+  namespace: stayontrack
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: web
+spec:
+  rules:
+    - host: stayontrack.site
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stayontrack-web  
+                port:
+                  number: 80
