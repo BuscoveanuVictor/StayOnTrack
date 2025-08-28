@@ -3,7 +3,6 @@ import stepImg from "../assets/step_by_step.jpg";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-
 const Home = () => {
   // Stiluri moderne
   const containerStyle = {
