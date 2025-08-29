@@ -135,6 +135,10 @@ passport.deserializeUser(async (id, done) => {
 
 // ****** RUTE ******
 
+app.get('/test', (req, res) => {
+  res.send('Serverul de backend este pornit');
+});
+
 // Auth cu google
 app.get('/auth/google',  
   // aici se incarca pagina de autentificare cu Google(alegere cont)

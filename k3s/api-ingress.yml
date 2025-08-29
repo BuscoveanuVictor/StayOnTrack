@@ -3,12 +3,22 @@ kind: Ingress
 metadata:
   name: stayontrack-api-ingress
   namespace: stayontrack
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   rules:
+  # Userul face cerere catre hostul de mai jos
+  # prima data se verifica catre ce route a facut
+  # ca a facut catre cea de api(backend)
+  # atunci o sa-l redirectioneze catre serviciul
+  # de backend, totodata mai sus am pus annotations
+  # care se ocupa de rescrierea URL-ului si 
+  # serverul de backend va prima ruta fara /api
+
     - host: stayontrack.site
       http:
         paths:
-          - path: /
+          - path: /api(/|$)(.*)
             pathType: Prefix
             backend:
               service:
