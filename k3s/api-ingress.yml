@@ -4,7 +4,7 @@ metadata:
   name: stayontrack-api-ingress
   namespace: stayontrack
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
   # Userul face cerere catre hostul de mai jos
