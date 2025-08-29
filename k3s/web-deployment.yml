@@ -31,7 +31,7 @@ spec:
             - containerPort: 80
           env:
             - name: REACT_APP_API_URL
-              value: http://stayontrack.site:5000
+              value: http://stayontrack.site
             
 ---
 apiVersion: v1

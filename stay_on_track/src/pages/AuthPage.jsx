@@ -103,7 +103,7 @@ const Home = () => {
             style={hover ? { ...buttonStyle, ...buttonHoverStyle } : buttonStyle}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
-            onClick={() => window.location.href = "http://stayontrack.site/auth/google"}
+            onClick={() => window.location.href = `${API_URL}/api/auth/google`}
           >
             Authentificate with Google
           </button>
