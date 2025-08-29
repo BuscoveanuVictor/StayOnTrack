@@ -27,11 +27,10 @@ spec:
                 secretKeyRef:
                   name: google-secrets
                   key: client_secret
-          ports:
-            - containerPort: 80
-          env:
             - name: REACT_APP_API_URL
               value: http://stayontrack.site
+          ports:
+            - containerPort: 80
             
 ---
 apiVersion: v1
