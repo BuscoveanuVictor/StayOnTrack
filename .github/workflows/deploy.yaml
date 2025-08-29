@@ -68,8 +68,10 @@ jobs:
             kubectl apply -f mongo-pvc.yml
             kubectl apply -f db-deployment.yml
             kubectl apply -f api-deployment.yml
+            kubectl apply -f api-ingress.yml
             kubectl apply -f web-deployment.yml
             kubectl apply -f web-ingress.yml
+             
 
             kubectl rollout restart deployment stayontrack-web -n stayontrack
             kubectl rollout restart deployment stayontrack-api -n stayontrack
