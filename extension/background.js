@@ -22,6 +22,8 @@ function currentTabManager(tab, tab_id){
         const urlObj = new URL(tab.url);
         const hostname = urlObj.hostname;
 
+        // verifyIfDataHaveBeenLoaded();
+
         if(blackList.includes(hostname)){ 
             chrome.storage.local.set({ currentSite: "Invalid url" });
             return;
@@ -48,7 +50,38 @@ function redirectIfBlocked(hostname, tabId){
             allowListMode(hostname, tabId);
         }
     });
+}
 
+function verifyIfDataHaveBeenLoaded(){
+    chrome.storage.sync.get(['hasBeenLoaded'],(data)=>{
+        if(!data.hasBeenLoaded){
+            fetch('http://localhost:5000/block-list.json', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                chrome.storage.sync.set({ blockList: data });
+            });
+
+            fetch('http://localhost:5000/allow-list.json', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                chrome.storage.sync.set({ allowList: data });
+            });
+
+            fetch('http://localhost:5000/task-list.json', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                chrome.storage.sync.set({ taskList: data });
+            });
+
+            fetch ('http://localhost:5000/get-mode', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                chrome.storage.sync.set({ mode: data.mode || 'block' });
+            });
+
+            chrome.storage.sync.set({ hasBeenLoaded: true })
+        }
+    })
 }
 
 function blockListMode(hostname, tabId){

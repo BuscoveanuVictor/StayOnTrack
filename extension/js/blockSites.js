@@ -6,8 +6,7 @@ if (chrome && chrome.storage && chrome.storage.sync) {
   chrome.storage.sync.get(['mode'], (data) => {
     if (data.mode === "allow") {
       document.body.classList.add('allow-mode');
-      document.getElementById('blockBtn').textContent = "Add to allow list";
-      document.title = "Allowed Sites";
+      document.getElementById('blockBtn').style.display = "none";
     } else {
       document.body.classList.remove('allow-mode');
       document.getElementById('blockBtn').textContent = "Add to block list";

@@ -20,3 +20,4 @@ node_modules/
 # Alte fisiere temporare
 *.bak
 *.tmp
+app.js.backup
