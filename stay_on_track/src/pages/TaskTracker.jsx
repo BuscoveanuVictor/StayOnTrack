@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 export default function TaskTracker() {
   const [taskList, setTaskList] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -58,24 +59,51 @@ export default function TaskTracker() {
   // dupa care la updateTask
   // il schimb si 'fizic'
   const editTask = (id) => {
+    if (editingTaskId === id) {
+      setEditingTaskId(null);
+      return;
+    }
     const task = taskList.find((t) => t.id === id);
     if (task) {
       setFormData({
         title: task.title,
         description: task.description || "",
-        date: task.date,
+        date: task.dueDate || task.date,
         time: task.time || "",
+        duration: task.duration || "",
       });
-      setEditId(id);
-      setShowForm(true);
+      setEditingTaskId(id);
     }
   };
 
   const updateTask = () => {
+    if (!formData.title) {
+      alert("Te rog introdu un titlu pentru task!");
+      return;
+    }
+    if (!formData.date) {
+      alert("Te rog selecteaza o data!");
+      return;
+    }
+    
     updateList(taskList.map((t) => 
-      t.id === editId ? { ...t, ...formData } : t
+      t.id === editingTaskId ? { 
+        ...t, 
+        title: formData.title,
+        description: formData.description,
+        dueDate: formData.date,
+        time: formData.time,
+        duration: formData.duration ? parseInt(formData.duration) : null
+      } : t
     ));
-    resetForm();
+    setEditingTaskId(null);
+    setFormData({
+      title: "",
+      description: "",
+      date: "",
+      time: "",
+      duration: "",
+    });
   };
 
   const toggleTaskForm = () => {
@@ -108,8 +136,10 @@ export default function TaskTracker() {
       description: "",
       date: "",
       time: "",
+      duration: "",
     });
     setEditId(null);
+    setEditingTaskId(null);
     setShowForm(false);
   };
 
@@ -142,6 +172,16 @@ export default function TaskTracker() {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Introdu titlul task-ului..."
+                style={styles.formGroupInput}
+              />
+              <label style={styles.formGroupLabel}>Durata (Optional):</label>
+              <input
+                type="number"
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                min="5"
+                step="5"
                 style={styles.formGroupInput}
               />
             </div>
@@ -181,16 +221,7 @@ export default function TaskTracker() {
             
 
             <div style={styles.formGroup}>
-              <label style={styles.formGroupLabel}>Durata (Optional):</label>
-              <input
-                type="number"
-                name="duration"
-                value={formData.duration}
-                onChange={handleChange}
-                min="5"
-                step="5"
-                style={styles.formGroupInput}
-              />
+             
 
             </div>
 
@@ -210,6 +241,7 @@ export default function TaskTracker() {
 
         <div style={styles.tasksList}>
           {taskList.map((task) => {
+            console.log(task);
             const dateTime = new Date(
               `${task.date} ${task.time || "00:00"}`
             ).toLocaleString("ro-RO", {
@@ -222,55 +254,120 @@ export default function TaskTracker() {
 
             return (
               <div key={task.id} style={styles.taskItem}>
-                <div
-                  style={styles.taskContent}
-                  onClick={() => editTask(task.id)}
-                >
+                <div style={styles.taskHeader}>
                   <div
-                    style={
-                      task.completed
-                        ? { ...styles.taskTitle, ...styles.taskTitleCompleted }
-                        : styles.taskTitle
-                    }
+                    style={styles.taskContent}
+                    onClick={() => editTask(task.id)}
                   >
+                    <div
+                      style={
+                        task.completed
+                          ? { ...styles.taskTitle, ...styles.taskTitleCompleted }
+                          : styles.taskTitle
+                      }
+                    >
 
-                  {task.duration && task.duration > 0 && (
-                    <span style={{ marginRight: 8, color: "#666" }}>
-                      {task.duration} min
-                    </span>
-                  )}
+                    {task.duration && task.duration > 0 && (
+                      <span style={{ marginRight: 8, color: "#666" }}>
+                        {task.duration} min
+                      </span>
+                    )}
 
-                    {task.title}
+                      {task.title}
 
-                  </div>
-                  {task.description && (
-                    <div style={styles.taskDescription}>
-                      {task.description}
                     </div>
-                  )}
-                  <div style={styles.taskDatetime}>📅 {dateTime}</div>
-                </div>
+                    {task.description && (
+                      <div style={styles.taskDescription}>
+                        {task.description}
+                      </div>
+                    )}
+                    <div style={styles.taskDatetime}>📅 {task.dueDate}</div>
+                  </div>
 
-                <div style={styles.taskActions}>
-                  <span
-                    onClick={() => toggleComplete(task.id)}
-                    title={
-                      task.completed
-                        ? "Marcheaza ca necompletat"
-                        : "Marcheaza ca completat"
-                    }
-                    style={{ ...styles.completeBtn, userSelect: "none" }}
-                  >
-                    {task.completed ? "✅" : "☐"}
-                  </span>
-                  <span
-                    onClick={() => deleteTask(task.id)}
-                    title="Sterge task"
-                    style={{ ...styles.deleteBtn, userSelect: "none" }}
-                  >
-                    🗑️
-                  </span>
+                  <div style={styles.taskActions}>
+                    <span
+                      onClick={() => toggleComplete(task.id)}
+                      title={
+                        task.completed
+                          ? "Marcheaza ca necompletat"
+                          : "Marcheaza ca completat"
+                      }
+                      style={{ ...styles.completeBtn, userSelect: "none" }}
+                    >
+                      {task.completed ? "✅" : "☐"}
+                    </span>
+                    <span
+                      onClick={() => deleteTask(task.id)}
+                      title="Sterge task"
+                      style={{ ...styles.deleteBtn, userSelect: "none" }}
+                    >
+                      🗑️
+                    </span>
+                  </div>
                 </div>
+                {editingTaskId === task.id && (
+                  <div style={styles.editForm}>
+                    <div style={styles.formGroup}>
+                      <label style={styles.formGroupLabel}>Titlu:</label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        style={styles.formGroupInput}
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.formGroupLabel}>Descriere:</label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        style={{ ...styles.formGroupInput, ...styles.formGroupTextarea }}
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.formGroupLabel}>Data:</label>
+                      <input
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        style={styles.formGroupInput}
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.formGroupLabel}>Ora:</label>
+                      <input
+                        type="time"
+                        name="time"
+                        value={formData.time}
+                        onChange={handleChange}
+                        style={styles.formGroupInput}
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.formGroupLabel}>Durata (min):</label>
+                      <input
+                        type="number"
+                        name="duration"
+                        value={formData.duration}
+                        onChange={handleChange}
+                        min="5"
+                        step="5"
+                        style={styles.formGroupInput}
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <button style={styles.submitBtn} onClick={updateTask}>
+                        Salveaza
+                      </button>
+                      <button style={styles.cancelBtn} onClick={() => setEditingTaskId(null)}>
+                        Anuleaza
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -384,6 +481,8 @@ const styles = {
     marginBottom: "15px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
     transition: "all 0.3s ease",
+  },
+  taskHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
@@ -435,5 +534,11 @@ const styles = {
     color: "#667eea",
     fontWeight: 500,
     fontSize: "14px",
+  },
+  editForm: {
+    padding: "15px",
+    borderTop: "1px solid #e9ecef",
+    backgroundColor: "#f8f9fa",
+    marginTop: "10px",
   },
 };

@@ -87,6 +87,18 @@ export default function BlockList() {
             window.postMessage({ type: "SET_MODE", mode: mode === "block" ? "allow" : "block" }, WEB_URL);
             // salvez modul local ca atunci cand intru in pagina sa fie acelasi
             window.localStorage.setItem("mode", mode === "block" ? "allow" : "block");
+            
+            console.log("ceva")
+
+            fetch(`${API_URL}/set-mode`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mode: mode === "block" ? "allow" : "block" })
+            })
+            
             // actualizez starea
             setMode(mode === "block" ? "allow" : "block");
         });

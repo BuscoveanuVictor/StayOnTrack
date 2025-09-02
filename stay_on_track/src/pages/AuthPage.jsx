@@ -10,7 +10,7 @@ const Home = () => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
+    background: "linear-gradient(90deg, #6366f1 0%, #a21caf 100%)",
     fontFamily: "Inter, Arial, sans-serif",
   };
 
@@ -81,6 +81,8 @@ const Home = () => {
     boxShadow: "0 6px 20px rgba(99,102,241,0.18)",
   };
 
+  
+
   // Pentru efect hover pe buton
   const [hover, setHover] = React.useState(false);
 
@@ -90,7 +92,7 @@ const Home = () => {
         <div style={leftStyle}>
           <img src={stepImg} alt="Descrierea imaginii" style={{ width: "100%", height: "100%", borderRadius: "16px", objectFit: "cover" }} />
           <div style={{ width: "320px", height: "420px", background: "transparent" }}>
-            {/* Imaginea ta va fi aici */}
+            {/* Imaginea va fi aici */}
           </div>
         </div>
         <div style={rightStyle}>
