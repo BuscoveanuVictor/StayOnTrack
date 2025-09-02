@@ -70,15 +70,6 @@ Următoarea diagramă prezintă principalele fluxuri ale aplicației StayOnTrack
    npm start
    ```
 
----
-
-### ⚙️ Variabile de mediu
-Fișierele `.env` (care urmează a fi adăugate) vor conține:  
-```env
-MONGO_URI=mongodb://localhost:27017/stay_on_track
-OAUTH_CLIENT_ID=<client_id>
-OAUTH_CLIENT_SECRET=<client_secret>
-```
 
 ---
 
