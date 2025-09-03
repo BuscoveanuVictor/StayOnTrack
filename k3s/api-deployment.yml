@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stayontrack-api
+  name: api
   namespace: stayontrack
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: stayontrack-api
+      app: api
   template:
     metadata:
       labels:
-        app: stayontrack-api
+        app: api
     spec:
       containers:
         - name: api
-          image: buscoveanuvictor/stay_on_track_api:latest
+          image: buscoveanuvictor/stayontrack_api:latest
           ports:
             - containerPort: 5000
           env:

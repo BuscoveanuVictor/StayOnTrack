@@ -105,7 +105,7 @@ const Home = () => {
             style={hover ? { ...buttonStyle, ...buttonHoverStyle } : buttonStyle}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
-            onClick={() => window.location.href = `${API_URL}/auth/google`}
+            onClick={() => window.location.href = `/api/auth/google`}
           >
             Authentificate with Google
           </button>
