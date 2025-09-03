@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'server/**'
-      - 'stay_on_track/**'
+      - 'client/**'
       - 'k3s/**'
     branches:
       - main  # rulează la push pe main
@@ -12,8 +12,8 @@ on:
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  IMAGE_WEB: ${{ secrets.DOCKER_USER }}/stay_on_track_web
-  IMAGE_API: ${{ secrets.DOCKER_USER }}/stay_on_track_api
+  IMAGE_WEB: ${{ secrets.DOCKER_USER }}/stayontrack_web
+  IMAGE_API: ${{ secrets.DOCKER_USER }}/stayontrack_api
 
 jobs:
   build-and-push:
@@ -72,6 +72,5 @@ jobs:
             kubectl apply -f web-deployment.yml
             kubectl apply -f web-ingress.yml
              
-
             kubectl rollout restart deployment stayontrack-web -n stayontrack
             kubectl rollout restart deployment stayontrack-api -n stayontrack
