@@ -6,7 +6,7 @@ on:
       - 'server/**'
       - 'client/**'
       - 'k3s/**'
-      - 'github/workflows/deploy.yaml'
+      - '.github/workflows/deploy.yaml'
     branches:
       - main 
      
