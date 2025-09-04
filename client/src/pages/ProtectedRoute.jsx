@@ -5,10 +5,14 @@ function ProtectedRoute({ children }) {
   const [isAuth, setIsAuth] = useState(null);
 
   useEffect(() => {
-    fetch("/auth/check", { credentials: "include" })
+    fetch("/api/auth/check", { credentials: "include" })
       .then(res => res.json())
-      .then(data => setIsAuth(data.auth))
+      .then(data => {
+        console.log(data);
+        setIsAuth(data.auth)
+      })
       .catch(() => setIsAuth(false));
+    
   }, []);
 
   if (isAuth === null) {
@@ -18,6 +22,7 @@ function ProtectedRoute({ children }) {
 
   if (!isAuth) {
     return <Navigate to="/auth/page" replace />;
+   
   }
 
   return children;

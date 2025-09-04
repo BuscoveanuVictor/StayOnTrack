@@ -16,12 +16,12 @@ spec:
       containers:
         - name: web
           image: buscoveanuvictor/stayontrack_web:latest
-          env:
-            - name: REACT_APP_API_URL
-              value: http://stayontrack.site
           ports:
             - containerPort: 80
-
+          env:
+            - name: WEB_SERVER_URL
+              value: http://stayontrack.site
+    
 ---
 apiVersion: v1
 kind: Service

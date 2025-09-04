@@ -26,10 +26,10 @@ jobs:
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
       - name: Build web image
-        run: docker build -t $IMAGE_WEB:latest ./client 
+        run: docker build -f Dockerfile.prod -t $IMAGE_WEB:latest ./client 
 
       - name: Build api image
-        run: docker build -t $IMAGE_API:latest ./server
+        run: docker build -f Dockerfile.prod -t $IMAGE_API:latest ./server
 
       - name: Push web image
         run: docker push $IMAGE_WEB:latest

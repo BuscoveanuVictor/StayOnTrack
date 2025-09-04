@@ -1,7 +1,3 @@
-exports.test = (req, res) => {
-  res.send('Serverul de backend este pornit');
-};
-
 exports.googleCallback = (req, res) => {
   console.log('User authenticated:', req.user);
   res.redirect(process.env.WEB_SERVER_URL + '/');

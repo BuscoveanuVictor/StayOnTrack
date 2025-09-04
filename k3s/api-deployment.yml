@@ -33,8 +33,6 @@ spec:
               value: mongodb://mongo:27017/StayOnTrack
             - name: WEB_SERVER_URL
               value: http://stayontrack.site
-            - name: API_SERVER_URL
-              value: http://stayontrack.site/api
 
 ---
 apiVersion: v1

@@ -3,8 +3,7 @@ import Modal from './Modal';
 import useListManager from './ListManager';
 import apiFetch from './ApiFetch';
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-const WEB_URL = process.env.REACT_WEB_URL || "http://localhost:3000";
+const WEB_SERVER_URL = process.env.REACT_WEB_SERVER_URL || "http://localhost:3000";
 
 export default function BlockList() {
     const [list, setList] = useState([]);
@@ -43,7 +42,7 @@ export default function BlockList() {
 
     async function ensureCanModify(callback) {
         try {
-            const rules = await apiFetch(`${API_URL}/rules`);
+            const rules = await apiFetch(`/api/rules`);
             const passwordEnabled = rules && rules.passwordEnabled;
             const passwordValidated = rules && rules.passwordValidated;
             if (passwordEnabled && !passwordValidated) {
@@ -84,21 +83,11 @@ export default function BlockList() {
     const handleChangeMode = () => {
         ensureCanModify(() => {
             // salvez modul pe extensie pentru background.js sa verifice site-urile
-            window.postMessage({ type: "SET_MODE", mode: mode === "block" ? "allow" : "block" }, WEB_URL);
+            window.postMessage({ type: "SET_MODE", mode: mode === "block" ? "allow" : "block" }, WEB_SERVER_URL);
             // salvez modul local ca atunci cand intru in pagina sa fie acelasi
             window.localStorage.setItem("mode", mode === "block" ? "allow" : "block");
-            
-            console.log("ceva")
-
-            fetch(`${API_URL}/set-mode`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ mode: mode === "block" ? "allow" : "block" })
-            })
-            
+            // salvez modul pe server
+            apiFetch(`/api/set-mode`, 'POST', { mode: mode === "block" ? "allow" : "block" })
             // actualizez starea
             setMode(mode === "block" ? "allow" : "block");
         });
@@ -115,7 +104,7 @@ export default function BlockList() {
             return;
         }
         try {
-            const result = await apiFetch(`${API_URL}/auth/validate-password`, 'POST', { password: passwordInput });
+            const result = await apiFetch(`/api/auth/validate-password`, 'POST', { password: passwordInput });
             if (result && result.passwordValidated) {
                 setShowPasswordModal(false);
                 setPasswordInput('');
@@ -143,7 +132,7 @@ export default function BlockList() {
             password: passwordChecked ? password : undefined
         };
         try {
-            const response = await apiFetch(`${API_URL}/rules`, 'POST', payload);
+            const response = await apiFetch(`/api/rules`, 'POST', payload);
             if (response) {
                 alert("Rules saved!");
                 setShowRulesModal(false);

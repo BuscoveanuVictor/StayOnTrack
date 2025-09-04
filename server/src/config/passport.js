@@ -2,15 +2,11 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const userRepo = require('../repositories/userRepository');
 
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`
-});
-console.log(process.env.CLIENT_ID);
+require('dotenv').config();
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const API_SERVER_URL = process.env.API_SERVER_URL;
-
+const WEB_SERVER_URL = process.env.WEB_SERVER_URL;
 
 // configurez strategia de autentificare cu Google
 // adica eu cand accesez /auth/google in browser
@@ -18,7 +14,7 @@ const API_SERVER_URL = process.env.API_SERVER_URL;
 passport.use(new GoogleStrategy({
   clientID: CLIENT_ID,
   clientSecret: CLIENT_SECRET,
-  callbackURL: `${API_SERVER_URL}/auth/google/callback`,
+  callbackURL: `${WEB_SERVER_URL}/api/auth/google/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // aici primesc raspunsul de la Google

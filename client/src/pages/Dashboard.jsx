@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-const API_URL = process.env.REACT_APP_API_URL;
-
 export default function Dashboard() {
 
   const [isAuth, setIsAuth] = useState(undefined);
@@ -10,7 +8,7 @@ export default function Dashboard() {
     if(isAuth == undefined)
       fetch("/auth/check", {
         method: "GET",
-        credentials: "include", // Asigură-te că trimiți cookie-urile de sesiune
+        credentials: "include", 
         headers:{
                 'Content-Type': 'application/json'
             },
@@ -87,10 +85,9 @@ export default function Dashboard() {
         {buttons.map((btn, index) =>
         { 
           if(btn.href.includes("auth") && isAuth){
-            btn.href = `${API_URL}/auth/google/logout`;
+            btn.href = `/api/auth/google/logout`;
             btn.label = "Logout"
           }
-          
           
           return(
             <button

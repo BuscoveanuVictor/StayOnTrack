@@ -21,6 +21,7 @@ function App() {
           <ProtectedRoute><TaskTracker /></ProtectedRoute>
         } />
         <Route path="/auth/page" element={<AuthPage />} />
+        
       </Routes>
     </Router>
   );
