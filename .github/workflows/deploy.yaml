@@ -6,6 +6,7 @@ on:
       - 'server/**'
       - 'client/**'
       - 'k3s/**'
+      - 'github/workflows/deploy.yaml'
     branches:
       - main  # rulează la push pe main
      
@@ -29,7 +30,7 @@ jobs:
         run: docker build -f ./client/Dockerfile.prod -t $IMAGE_WEB:latest ./client 
 
       - name: Build api image
-        run: docker build -f ./client/Dockerfile.prod -t $IMAGE_API:latest ./server
+        run: docker build -f ./server/Dockerfile.prod -t $IMAGE_API:latest ./server
 
       - name: Push web image
         run: docker push $IMAGE_WEB:latest
