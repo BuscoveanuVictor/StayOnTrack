@@ -60,6 +60,7 @@ jobs:
             cd StayOnTrack
             git sparse-checkout init --cone
             git sparse-checkout set k3s
+            git checkout main
 
             cd k3s
 
