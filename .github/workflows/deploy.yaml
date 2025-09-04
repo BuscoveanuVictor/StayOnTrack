@@ -8,7 +8,7 @@ on:
       - 'k3s/**'
       - 'github/workflows/deploy.yaml'
     branches:
-      - main  # rulează la push pe main
+      - main 
      
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
