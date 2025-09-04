@@ -1,15 +1,15 @@
 name: Build and Deploy Services
 
 on:
+  workflow_dispatch:   # rulezi manual din GitHub UI
   push:
+    branches:
+      - main
     paths:
       - 'server/**'
       - 'client/**'
       - 'k3s/**'
-      - '.github/workflows/deploy.yaml'
-    branches:
-      - main 
-     
+      
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
