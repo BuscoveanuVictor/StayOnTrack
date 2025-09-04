@@ -49,6 +49,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+          
             export CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} 
             export CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
@@ -73,5 +74,5 @@ jobs:
             kubectl apply -f web-deployment.yml
             kubectl apply -f web-ingress.yml
              
-            kubectl rollout restart deployment stayontrack-web -n stayontrack
-            kubectl rollout restart deployment stayontrack-api -n stayontrack
+            kubectl rollout restart deployment web -n stayontrack
+            kubectl rollout restart deployment api -n stayontrack
