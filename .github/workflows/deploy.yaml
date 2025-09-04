@@ -1,7 +1,7 @@
 name: Build and Deploy Services
 
 on:
-  workflow_dispatch:   # rulezi manual din GitHub UI
+  workflow_dispatch:   # ca sa rulez manual din GitHub UI
   push:
     branches:
       - main
@@ -9,7 +9,7 @@ on:
       - 'server/**'
       - 'client/**'
       - 'k3s/**'
-      
+
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -60,9 +60,8 @@ jobs:
             cd StayOnTrack
             git sparse-checkout init --cone
             git sparse-checkout set k3s
-            git checkout main 
 
-            cd StayOnTrack/k3s
+            cd k3s
 
             kubectl apply -f namespace.yml
             envsubst < google-secrets.yml | kubectl apply -f -
