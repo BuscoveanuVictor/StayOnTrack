@@ -5,7 +5,7 @@ export default function Dashboard() {
   const buttons = [
     { href: "task-list", label: "Tasks" },
     { href: "block-list", label: "Block list" },
-    { href: "/api/logout", label: "Logout"}
+    { href: "/api/auth/google/logout", label: "Logout"}
   ]
 
   const handleNavigation = (href) => {
