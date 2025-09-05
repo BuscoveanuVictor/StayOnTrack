@@ -62,10 +62,6 @@ export default function Dashboard() {
       <div style={buttonContainerStyle}>
         {buttons.map((btn, index) =>
         { 
-          if(btn.href.includes("auth") && isAuth){
-            btn.href = `/api/auth/google/logout`;
-            btn.label = "Logout"
-          }
           
           return(
             <button
