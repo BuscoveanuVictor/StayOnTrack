@@ -10,7 +10,7 @@
     },
     "overrides": [
       {
-        "files": ["stay_on_track/**/*.{js,jsx}"],
+        "files": ["client/**/*.{js,jsx}"],
         "env": {
           "browser": true,
           "es6": true

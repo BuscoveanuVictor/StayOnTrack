@@ -7,6 +7,7 @@ services:
       - /app/node_modules
     environment:
       - WEB_SERVER_URL=http://localhost:80
+      # pentru hot reloading in docker
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
 
@@ -23,12 +24,12 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.docker.conf:/etc/nginx/conf.d/default.conf
 
   db:
     image: mongo:latest
     ports:
-      - "27015:27017"
+      - "27017:27017"
 
   
    

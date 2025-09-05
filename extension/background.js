@@ -1,3 +1,5 @@
+// const WEB_SERVER_URL = 'http://localhost'; // dev
+
 const WEB_SERVER_URL = 'http://stayontrack.site';
 
 const blackList = [
@@ -87,10 +89,9 @@ function verifyIfDataHaveBeenLoaded(){
 
 function blockListMode(hostname, tabId){
     chrome.storage.sync.get(['blockList'], (data) => {
-        console.log("Block list:", data.blockList.list);
-        if(data.blockList.list.includes(hostname)){
+        if(data.blockList.includes(hostname)){
             chrome.storage.sync.get(['taskList'], (data)=>{
-                if(data && data.taskList.list.find(elem => elem.completed == false)){
+                if(data && data.taskList.find(elem => elem.completed == false)){
                     chrome.tabs.update(tabId, { url: `${WEB_SERVER_URL}/task-list`});
                 }
             })

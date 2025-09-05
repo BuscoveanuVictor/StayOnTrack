@@ -11,8 +11,9 @@
         "activeTab",
         "tabs"
     ],
+
     "host_permissions": [
-        "http://localhost:3000/*",
+        "http://localhost/*",
         "http://stayontrack.site/*"
     ],
     
@@ -23,7 +24,7 @@
     "content_scripts": [
         {
             "matches": [
-                "http://localhost:*/*",
+                "http://localhost/*",
                 "http://stayontrack.site/*"
             ],
             "js": ["content.js"]

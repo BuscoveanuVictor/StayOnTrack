@@ -2,31 +2,10 @@ import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
 
-  const [isAuth, setIsAuth] = useState(undefined);
-
-  useEffect(() => {
-    if(isAuth == undefined)
-      fetch("/auth/check", {
-        method: "GET",
-        credentials: "include", 
-        headers:{
-                'Content-Type': 'application/json'
-            },
-      })
-      .then(res => res.json())
-      .then((data) => {
-        setIsAuth(data.auth);
-      })
-      .catch((error) => {
-        console.error("Eroare la verificarea autentificarii:", error);
-      });
-  },[])
-
-
   const buttons = [
     { href: "task-list", label: "Tasks" },
     { href: "block-list", label: "Block list" },
-    { href: "auth", label: "Authentificate"}
+    { href: "/api/logout", label: "Logout"}
   ]
 
   const handleNavigation = (href) => {
@@ -35,7 +14,6 @@ export default function Dashboard() {
 
   // Stiluri CSS inline
   const containerStyle = {
-
     height: "100vh",
     display: "flex",
     flexDirection: "column",
