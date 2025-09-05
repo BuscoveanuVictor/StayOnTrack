@@ -1,7 +1,8 @@
+const WEB_SERVER_URL = "http://stayontrack.site";
+
 // Cand se afieseaza pagina externsiei 
 // de blocare a site-urilor sa vada userul
 // ce site vrea sa blocheze
-
 if (chrome && chrome.storage && chrome.storage.sync) {
   chrome.storage.sync.get(['mode'], (data) => {
     if (data.mode === "allow") {
@@ -22,7 +23,7 @@ if (chrome && chrome.storage && chrome.storage.sync) {
 }
 document.getElementById('editBtn').addEventListener('click', async  () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    chrome.tabs.update(tab.id, { url: "http://localhost:3000/block-list"});
+chrome.tabs.update(tab.id, { url: `${WEB_SERVER_URL}/block-list`});
 });
 
 let currentSite;
@@ -44,7 +45,7 @@ window.addEventListener('load',()=>{
 })
 
 function remoteSave(hostname){
-    fetch('http://localhost:5000/block-list/add-domain', {
+    fetch(`${WEB_SERVER_URL}/api/block-list/add-domain`, {
         method: 'POST',
         credentials : "include",
         headers: {
@@ -63,7 +64,7 @@ function remoteSave(hostname){
     });
 }
 
-const WEB_URL = "http://localhost:3000";
+
 function localSave(blockList){
     chrome.storage.sync.set({ blockList : blockList}, () => {
         console.log("Domain salvat în sync storage!");

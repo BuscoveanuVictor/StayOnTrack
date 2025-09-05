@@ -12,7 +12,8 @@
         "tabs"
     ],
     "host_permissions": [
-        "http://localhost:5000/*"
+        "http://localhost:3000/*",
+        "http://stayontrack.site/*"
     ],
     
     "background": {
@@ -21,7 +22,10 @@
 
     "content_scripts": [
         {
-            "matches": ["http://localhost:*/*"],
+            "matches": [
+                "http://localhost:*/*",
+                "http://stayontrack.site/*"
+            ],
             "js": ["content.js"]
         }
     ]

@@ -3,9 +3,11 @@
 // Si asculta mesajele de la pagina web pentru actualizare(update local storage etc.)
 // deci e un middle man intre pagina web si extensie
 
-const WEB_URL = "http://localhost:3000";
 window.addEventListener('message', (event) => {
-    
+    // acept mesaje doar de la domeniul nostru
+    const origin = event.origin || (event.source && event.source.origin);
+    if (origin && !origin.includes('stayontrack.site') && !origin.includes('localhost')) return;
+
     if (event.data.type === 'update-block-list-data'){
         chrome.storage.sync.set({ blockList : event.data.list }, () => {
             console.log("Sync storage updated!");

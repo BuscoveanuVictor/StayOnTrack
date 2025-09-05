@@ -31,7 +31,6 @@ if (chrome && chrome.storage && chrome.storage.sync) {
 }
 });
 
-
 // Setează clasa pe body în funcție de mode-ul din chrome.storage.sync
 if (chrome && chrome.storage && chrome.storage.sync) {
   chrome.storage.sync.get(['mode'], (data) => {

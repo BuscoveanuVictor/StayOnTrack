@@ -3,8 +3,6 @@ import Modal from './Modal';
 import useListManager from './ListManager';
 import apiFetch from './ApiFetch';
 
-const WEB_SERVER_URL = process.env.REACT_WEB_SERVER_URL || "http://localhost:3000";
-
 export default function BlockList() {
     const [list, setList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,7 +81,7 @@ export default function BlockList() {
     const handleChangeMode = () => {
         ensureCanModify(() => {
             // salvez modul pe extensie pentru background.js sa verifice site-urile
-            window.postMessage({ type: "SET_MODE", mode: mode === "block" ? "allow" : "block" }, WEB_SERVER_URL);
+            window.postMessage({ type: "SET_MODE", mode: mode === "block" ? "allow" : "block" }, window.location.origin);
             // salvez modul local ca atunci cand intru in pagina sa fie acelasi
             window.localStorage.setItem("mode", mode === "block" ? "allow" : "block");
             // salvez modul pe server

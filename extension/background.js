@@ -1,7 +1,9 @@
+const WEB_SERVER_URL = 'http://stayontrack.site';
+
 const blackList = [
     "localhost",
     "127.0.0.1",
-    "StayOnTrack.site",
+    "stayontrack.site",
     "extensions",
     "newtab"
 ];
@@ -22,7 +24,7 @@ function currentTabManager(tab, tab_id){
         const urlObj = new URL(tab.url);
         const hostname = urlObj.hostname;
 
-        // verifyIfDataHaveBeenLoaded();
+        verifyIfDataHaveBeenLoaded();
 
         if(blackList.includes(hostname)){ 
             chrome.storage.local.set({ currentSite: "Invalid url" });
@@ -44,36 +46,35 @@ function currentTabManager(tab, tab_id){
 function redirectIfBlocked(hostname, tabId){
     chrome.storage.sync.get(['mode'], (data) => {
         const mode = data.mode;
-        if(mode === 'block'){
-            blockListMode(hostname, tabId);
-        } else {
+        if(mode === 'allow') 
             allowListMode(hostname, tabId);
-        }
+        else blockListMode(hostname, tabId);
+        
     });
 }
 
 function verifyIfDataHaveBeenLoaded(){
     chrome.storage.sync.get(['hasBeenLoaded'],(data)=>{
         if(!data.hasBeenLoaded){
-            fetch('http://localhost:5000/block-list.json', { credentials: 'include' })
+            fetch(`${WEB_SERVER_URL}/api/block-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 chrome.storage.sync.set({ blockList: data });
             });
 
-            fetch('http://localhost:5000/allow-list.json', { credentials: 'include' })
+            fetch(`${WEB_SERVER_URL}/api/allow-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 chrome.storage.sync.set({ allowList: data });
             });
 
-            fetch('http://localhost:5000/task-list.json', { credentials: 'include' })
+            fetch(`${WEB_SERVER_URL}/api/task-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 chrome.storage.sync.set({ taskList: data });
             });
 
-            fetch ('http://localhost:5000/get-mode', { credentials: 'include' })
+            fetch(`${WEB_SERVER_URL}/api/get-mode`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 chrome.storage.sync.set({ mode: data.mode || 'block' });
@@ -86,10 +87,11 @@ function verifyIfDataHaveBeenLoaded(){
 
 function blockListMode(hostname, tabId){
     chrome.storage.sync.get(['blockList'], (data) => {
-        if(data.blockList.includes(hostname)){
+        console.log("Block list:", data.blockList.list);
+        if(data.blockList.list.includes(hostname)){
             chrome.storage.sync.get(['taskList'], (data)=>{
-                if(data && data.taskList.find(elem => elem.completed == false)){
-                    chrome.tabs.update(tabId, { url: "http://localhost:3000/task-list"});
+                if(data && data.taskList.list.find(elem => elem.completed == false)){
+                    chrome.tabs.update(tabId, { url: `${WEB_SERVER_URL}/task-list`});
                 }
             })
         }
@@ -101,7 +103,7 @@ function allowListMode(hostname, tabId){
         if(!data.allowList.includes(hostname)){
             chrome.storage.sync.get(['taskList'], (data)=>{
                 if(data && data.taskList.find(elem => elem.completed == false)){
-                    chrome.tabs.update(tabId, { url: "http://localhost:3000/task-list"});
+                    chrome.tabs.update(tabId, { url: `${WEB_SERVER_URL}/task-list`});
                 }
             })
         }
@@ -124,7 +126,7 @@ function todayKey(){
 
 async function fetchServerRules(){
     try{
-        const resp = await fetch('http://localhost:5000/rules', { credentials: 'include' });
+        const resp = await fetch(`${WEB_SERVER_URL}/api/rules`, { credentials: 'include' });
         if(!resp.ok) return;
         const data = await resp.json();
         if(typeof data.breakTime === 'number' && data.breakTime > 0){

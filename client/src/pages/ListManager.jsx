@@ -1,7 +1,5 @@
 import apiFetch from "./ApiFetch";
 
-const WEB_SERVER_URL = process.env.REACT_APP_WEB_SERVER_URL || "http://localhost:3000";
-
 export default function useListManager({ list, setList, label = "block-list" }) {
   
     function loadList() {
@@ -18,7 +16,7 @@ export default function useListManager({ list, setList, label = "block-list" }) 
         window.postMessage({ 
             type: `update-${label}-data`, 
             list: newList 
-        }, WEB_SERVER_URL);
+        }, window.location.origin);
     }
 
     // fetch din diagrama UML

@@ -1,6 +1,6 @@
 let TIMER_SECONDS = 5 * 60;
 let MAX_BREAKS_PER_DAY = null;
-const API_URL = 'http://localhost:5000';
+const API_URL = 'http://stayontrack.site/api';
 const timerText = document.getElementById('timerText');
 const timerProgress = document.getElementById('timerProgress');
 const breakBtn = document.getElementById('breakBtn');
