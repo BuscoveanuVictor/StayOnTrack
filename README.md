@@ -32,13 +32,13 @@ Următoarea diagramă prezintă principalele fluxuri ale aplicației StayOnTrack
 
 ---
 
-## 🔧 Instalare și rulare (local)
+## 🔧 Instalare și rulare a aplicației web (local)
 
 ### Cerințe
 - [Docker](https://docs.docker.com/get-docker/) instalat  
 - [Docker Compose](https://docs.docker.com/compose/) instalat
 
-### Pași
+### Pași 
 1. Clonează proiectul:
 ```bash
 git clone <repo-url>
@@ -48,7 +48,22 @@ cd STAYONTRACK
 ```bash
 docker compose up
 ```
-3. Pentru utilizarea extensiei de browser: citește README-ul din directorul `extension`.
+
+---
+
+## 📌 Instalare Extensie Browser
+
+> **Notă:** Extensia este compatibilă **doar cu browserele Chromium** (ex. Chrome, Edge, Brave).
+
+1. Deschide setările browserului.  
+2. Navighează la secțiunea **Extensions** (Extensii).  
+3. În colțul din dreapta sus, activează **Developer mode** (Mod dezvoltator).  
+4. Apasă pe **Load unpacked** (Încarcă extensia neambalată).  
+5. Selectează directorul `extension` din proiectul tău.  
+
+După acești pași, extensia va fi încărcată și activă în browserul tău.
+
+---
 
 ### 🔑 Configurare autentificare Google
 Pentru a folosi opțiunea de **Login cu Google**, creează credențiale OAuth 2.0 din Google Cloud Console:
