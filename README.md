@@ -149,7 +149,7 @@ Pentru o vizualizare detaliată a tuturor user stories-urilor cu criterii de acc
 ### 🧠 **Învățare și Înțelegere Concepte**
 - **Kubernetes:** Înțelegerea orchestrei containerelor, deployment-urilor și serviciilor
 - **React:** Profundarea conceptelor de hooks, state management și component lifecycle
-- **Extensii Web:** Comprehenderea arhitecturii Chrome Extensions și comunicării între componente
+- **Extensii Web:** Priceperea arhitecturii Chrome Extensions și comunicării între componente
 - **Docker:** Aprofundarea containerizării, Docker Compose și best practices
 - **JavaScript:** Îmbunătățirea cunoașterii ES6+, async/await și module system
 
