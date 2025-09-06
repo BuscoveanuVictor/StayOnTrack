@@ -1,6 +1,5 @@
-// const WEB_SERVER_URL = 'http://localhost'; // dev
 
-const WEB_SERVER_URL = 'http://stayontrack.site';
+importScripts('config.js');
 
 const blackList = [
     "localhost",
@@ -61,19 +60,19 @@ function verifyIfDataHaveBeenLoaded(){
             fetch(`${WEB_SERVER_URL}/api/block-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
-                chrome.storage.sync.set({ blockList: data });
+                chrome.storage.sync.set({ blockList: data || [] });
             });
 
             fetch(`${WEB_SERVER_URL}/api/allow-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
-                chrome.storage.sync.set({ allowList: data });
+                chrome.storage.sync.set({ allowList: data || [] });
             });
 
             fetch(`${WEB_SERVER_URL}/api/task-list.json`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
-                chrome.storage.sync.set({ taskList: data });
+                chrome.storage.sync.set({ taskList: data || [] });
             });
 
             fetch(`${WEB_SERVER_URL}/api/get-mode`, { credentials: 'include' })

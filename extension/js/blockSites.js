@@ -1,4 +1,3 @@
-const WEB_SERVER_URL = "http://stayontrack.site";
 
 // Cand se afieseaza pagina externsiei 
 // de blocare a site-urilor sa vada userul
@@ -23,7 +22,7 @@ if (chrome && chrome.storage && chrome.storage.sync) {
 }
 document.getElementById('editBtn').addEventListener('click', async  () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-chrome.tabs.update(tab.id, { url: `${WEB_SERVER_URL}/block-list`});
+    chrome.tabs.update(tab.id, { url: `${WEB_SERVER_URL}/block-list`});
 });
 
 let currentSite;

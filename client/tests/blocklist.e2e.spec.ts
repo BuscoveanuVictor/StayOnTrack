@@ -1,10 +1,9 @@
 import { test, expect, request } from '@playwright/test';
 
-const API_URL = process.env.API_URL || 'http://localhost:5000';
-const WEB_URL = process.env.WEB_URL || 'http://localhost:3000';
+const WEB_SERVER_URL = process.env.WEB_SERVER_URL || 'http://localhost';
 
 async function programmaticLogin(context) {
-  const resp = await context.request.post(`${API_URL}/auth/test-login`, {
+  const resp = await context.request.post(`${WEB_SERVER_URL}/api/auth/test-login`, {
     data: { email: 'e2e.user@example.com' }
   });
   expect(resp.ok()).toBeTruthy();
@@ -13,7 +12,7 @@ async function programmaticLogin(context) {
 test('BlockList add domain persists after refresh', async ({ page, context }) => {
   await programmaticLogin(context);
 
-  await page.goto(`${WEB_URL}/block-list`);
+  await page.goto(`${WEB_SERVER_URL}/block-list`);
 
   const addBtn = page.getByRole('button', { name: '+ Add blocked site' });
   await addBtn.click();

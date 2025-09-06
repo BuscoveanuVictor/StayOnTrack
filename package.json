@@ -19,7 +19,7 @@
     "jest-environment-jsdom": "^30.1.2"
   },
   "scripts": {
-    "lint": "eslint stay_on_track/ server/",
-    "lint:fix": "eslint stay_on_track/ server/ --fix"
+    "lint": "eslint client/ server/",
+    "lint:fix": "eslint client/ server/ --fix"
   }
 }

@@ -11,7 +11,7 @@ router.get('/google/logout', ensureAuth, logout);
 router.get('/check', check);
 router.get('/password-status', ensureAuth, passwordStatus);
 
-// Dev-only programmatic login
+// Testare e2e - login 
 router.post('/test-login', testLogin);
 
 module.exports = router;

@@ -1,12 +1,14 @@
-let TIMER_SECONDS = 5 * 60;
-let MAX_BREAKS_PER_DAY = null;
-const API_URL = 'http://stayontrack.site/api';
+
 const timerText = document.getElementById('timerText');
 const timerProgress = document.getElementById('timerProgress');
 const breakBtn = document.getElementById('breakBtn');
 const breakInfo = document.getElementById('breakInfo');
 const radius = 108;
 const circumference = 2 * Math.PI * radius;
+
+let TIMER_SECONDS = 5 * 60;
+let MAX_BREAKS_PER_DAY = null;
+
 
 timerProgress.setAttribute('stroke-dasharray', circumference);
 timerProgress.setAttribute('stroke-dashoffset', circumference);
@@ -25,7 +27,7 @@ function updateTimer(seconds) {
 
 async function fetchBreakRules() {
     try {
-        const resp = await fetch(`${API_URL}/rules`, { credentials: 'include' });
+        const resp = await fetch(`${WEB_SERVER_URL}/api/rules`, { credentials: 'include' });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const data = await resp.json();
         if (typeof data.breakTime === 'number' && data.breakTime > 0) {

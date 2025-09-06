@@ -57,7 +57,7 @@ app.use('/test', (req, res) => {
 });
 app.use('/auth', authRoutes);
 app.use('/rules', rulesRoutes);
-app.use('/', listRoutes); // păstrează compatibilitatea cu rutele existente
-app.use('/', taskRoutes); // idem
+app.use('/', listRoutes); 
+app.use('/', taskRoutes); 
 
 module.exports = app;

@@ -10,13 +10,15 @@ până la finalizarea task-urilor din ziua respectivă.
 - **Frontend (Web):** React  
 - **Backend:** Node.js cu Express  
 - **Bază de date:** MongoDB  
-- **Containerizare:** Docker  
+- **Containerizare:** Docker + Docker Compose  
+- **Orchestrare:** Kubernetes (k3s)  
+- **CI/CD:** GitHub Actions + Git  
 
 ---
 
 ## 🏗️ Arhitectura generală
 Aplicația urmează modelul **client-server**:  
-- **Client:** aplicația React și extensia web care oferă interfața utilizatorului.  
+- **Client:** aplicația React Web care oferă interfața utilizatorului.  
 - **Server:** aplicația Node.js cu Express care expune un set de API-uri REST și gestionează logica aplicației.  
 - **Bază de date:** MongoDB, pentru stocarea utilizatorilor, task-urilor și listelor de site-uri blocate.  
 
@@ -33,51 +35,50 @@ Următoarea diagramă prezintă principalele fluxuri ale aplicației StayOnTrack
 ## 🔧 Instalare și rulare (local)
 
 ### Cerințe
-- [Node.js & npm](https://nodejs.org/) instalate  
-- MongoDB instanțiat local sau accesibil printr-un connection string  
+- [Docker](https://docs.docker.com/get-docker/) instalat  
+- [Docker Compose](https://docs.docker.com/compose/) instalat
 
 ### Pași
 1. Clonează proiectul:  
    ```bash
    git clone <repo-url>
+   cd STAYONTRACK
+   ```
+2. Ruleaza aplicatia si asteapta sa porneasca serverele:
+   ```bash
+   docker compose up
    ```
 
-2. Instalează dependențele pentru **server**:  
-   ```bash
-   cd server
-   npm install
-   ```
+3. Pentru utilizarea extensiei de browser: citește README-ul din directorul extension.
 
-3. Instalează dependențele pentru **frontend**:  
-   ```bash
-   cd ../stay_on_track
-   npm install
-   ```
+### 🔑 Configurare autentificare Google
 
-4. Rulează serverul backend (Node.js):  
-   ```bash
-   cd server
-   node app.js
-   ```
-   sau, pentru dezvoltare cu autoreload:  
-   ```bash
-   nodemon app.js
-   ```
+Pentru a putea folosi opțiunea de **Login cu Google**, este nevoie să îți creezi propriile credențiale OAuth 2.0 din Google Cloud Console:
 
-5. Rulează frontend-ul (React):  
-   ```bash
-   cd stay_on_track
-   npm start
-   ```
+1. Accesează: [Google Cloud Console](https://console.cloud.google.com/auth/clients)  
+2. Creează un proiect nou sau folosește unul existent.  
+3. Mergi la **APIs & Services → Credentials** și adaugă un nou **OAuth 2.0 Client ID**.  
+4. Configurează tipul de aplicație ca **Web application** și adaugă la
+   - Authorized JavaScript origins: http://localhost:80
+   - Authorized redirect URIs : http://localhost:80/api/auth/google/callback
+5. După crearea credențialelor, vei primi un **Client ID** și un **Client Secret**.  
+Creează un fișier `.env` în directorul **server** și adaugă acolo:  
+```env
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
 
 
 ---
 
 ## 📂 Structura proiectului
 ```
-/server          -> backend Node.js + Express
-/stay_on_track   -> aplicația React (web frontend)
-/extension       -> extensia de browser
+   .github         -> workflow-ul de deployment (GitHub Actions)
+   assets          -> resurse (diagrame, imagini)
+   client          -> aplicația React (frontend web)
+   server          -> backend Node.js + Express
+   extension       -> extensia de browser
+   k3s             -> fișierele de deployment pentru k3s
 ```
 
 ---
@@ -104,15 +105,24 @@ Exemplu de document în `users`:
 ---
 
 ## 🧪 Testare
-Teste unitare și de integrare – în curs de implementare.  
+Testele pot fi rulate cu Playwright:  
+   ```bash
+   npx playwright test
+   ```
+Testele actuale verifică:
+- Pornirea serverului
+- Autentificarea
+- Adăugarea unui site în block-list și persistența acestuia după refresh
 
 ---
 
 ## ☁️ Deployment
 Proces automatizat cu **GitHub Actions**:  
-1. Se construiește aplicația React → build static servit de **Nginx**  
-2. Se creează o imagine Docker pentru backend (Node.js)  
-3. Ambele imagini sunt urcate pe **Docker Hub**  
+1.Se construiește aplicația React → build static servit de Nginx
+2.Se creează o imagine Docker pentru backend (Node.js)
+3.Ambele imagini sunt urcate pe Docker Hub
+4.Pe serverul de producție: workflow-ul se conectează prin SSH, actualizează imaginile și clusterul k3s reîmprospătează pod-urile.
 
-Pe serverul de producție:  
-- Un script rulează prin **SSH**, trage noile imagini și le pornește cu **Docker Compose**.  
+![Diagrama workflow deployment cu Github Actions](./assets/workflow_deployment.png)
+![Diagrama arhitectura clusterului Kubernetes](./assets/cluster_arhitecture)
+
